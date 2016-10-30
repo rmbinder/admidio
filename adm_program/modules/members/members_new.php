@@ -4,7 +4,7 @@
  * Enter firstname and surname and checks if member already exists
  *
  * @copyright 2004-2016 The Admidio Team
- * @see http://www.admidio.org/
+ * @see https://www.admidio.org/
  * @license https://www.gnu.org/licenses/gpl-2.0.html GNU General Public License v2.0 only
  ***********************************************************************************************
  */
@@ -19,7 +19,7 @@ if (!$gCurrentUser->editUsers())
 }
 
 echo '
-<script type="text/javascript"><!--
+<script type="text/javascript">
     $("body").on("shown.bs.modal", ".modal", function () {
         $("#form_members_create_user:first *:input[type!=hidden]:first").focus();
     });
@@ -41,7 +41,7 @@ echo '
                     formMembersAlert.html("<span class=\"glyphicon glyphicon-ok\"></span><strong>'.$gL10n->get('MEM_USER_COULD_BE_CREATED').'</strong>");
                     formMembersAlert.fadeIn("slow");
                     setTimeout(function () {
-                        self.location.href="'.$g_root_path.'/adm_program/modules/profile/profile_new.php?new_user=1&lastname=" + $("#lastname").val() + "&firstname=" + $("#firstname").val();
+                        self.location.href="'.ADMIDIO_URL.'/adm_program/modules/profile/profile_new.php?new_user=1&lastname=" + $("#lastname").val() + "&firstname=" + $("#firstname").val();
                     },2500);
                 } else {
                     if(data.length > 1000) {
@@ -55,7 +55,7 @@ echo '
             }
         });
     });
-//--></script>
+</script>
 
 <div class="modal-header">
     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
@@ -64,9 +64,9 @@ echo '
 <div class="modal-body">
     <p class="lead">'.$gL10n->get('MEM_INPUT_FIRSTNAME_LASTNAME').'</p>';
 
-    $form = new HtmlForm('form_members_create_user', $g_root_path.'/adm_program/modules/members/members_assign.php');
+    $form = new HtmlForm('form_members_create_user', ADMIDIO_URL.'/adm_program/modules/members/members_assign.php');
     $form->addInput('lastname', $gL10n->get('SYS_LASTNAME'), null, array('maxLength' => 100, 'property' => FIELD_REQUIRED));
     $form->addInput('firstname', $gL10n->get('SYS_FIRSTNAME'), null, array('maxLength' => 100, 'property' => FIELD_REQUIRED));
-    $form->addSubmitButton('btn_add', $gL10n->get('MEM_CREATE_USER'), array('icon' => THEME_PATH.'/icons/add.png', 'class' => ' col-sm-offset-3'));
+    $form->addSubmitButton('btn_add', $gL10n->get('MEM_CREATE_USER'), array('icon' => THEME_URL.'/icons/add.png', 'class' => ' col-sm-offset-3'));
     $form->show();
 echo '</div>';

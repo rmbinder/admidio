@@ -2,7 +2,7 @@
 /**
  ***********************************************************************************************
  * @copyright 2004-2016 The Admidio Team
- * @see http://www.admidio.org/
+ * @see https://www.admidio.org/
  * @license https://www.gnu.org/licenses/gpl-2.0.html GNU General Public License v2.0 only
  ***********************************************************************************************
  */
@@ -75,7 +75,7 @@ class HtmlFormBasic extends HtmlElement
      */
     public function __construct($action = null, $id = null, $method = 'get', $event = null, $script = null)
     {
-        parent::__construct('form', '', '', true);
+        parent::__construct('form');
 
         // set action attribute
         if ($action !== null)

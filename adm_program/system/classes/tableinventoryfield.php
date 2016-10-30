@@ -4,7 +4,7 @@
  * Class manages access to database table adm_invent_fields
  *
  * @copyright 2004-2016 The Admidio Team
- * @see http://www.admidio.org/
+ * @see https://www.admidio.org/
  * @license https://www.gnu.org/licenses/gpl-2.0.html GNU General Public License v2.0 only
  ***********************************************************************************************
  */
@@ -186,7 +186,7 @@ class TableInventoryField extends TableAccess
                                     }
                                     elseif(admStrIsValidFileName($listValueImage, true))
                                     {
-                                        $listValue = '<img class="admidio-icon-info" src="'.THEME_PATH.'/icons/'.$listValueImage.'" title="'.$listValueText.'" alt="'.$listValueText.'" />';
+                                        $listValue = '<img class="admidio-icon-info" src="'.THEME_URL.'/icons/'.$listValueImage.'" title="'.$listValueText.'" alt="'.$listValueText.'" />';
                                     }
                                 }
                                 catch(AdmException $e)

@@ -4,7 +4,7 @@
  * Konfigurationsdatei fuer Admidio-Plugin Sidebar-Dates
  *
  * @copyright 2004-2016 The Admidio Team
- * @see http://www.admidio.org/
+ * @see https://www.admidio.org/
  * @license https://www.gnu.org/licenses/gpl-2.0.html GNU General Public License v2.0 only
  ***********************************************************************************************
  */
@@ -37,7 +37,7 @@ $plg_show_headline = 1;
 
 // Angabe der Prefix-Url für den Aufruf in Joomla
 // wenn keine Angabe erfolgt dann wird die Standard-URL von Admidio verwendet
-$plg_link_url = $g_root_path. '/adm_program/modules/dates/dates.php';
+$plg_link_url = ADMIDIO_URL. '/adm_program/modules/dates/dates.php';
 
 // Name einer CSS-Klasse fuer Links
 // Nur noetig, falls die Links ein anderes Aussehen bekommen sollen

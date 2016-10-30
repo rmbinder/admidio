@@ -4,7 +4,7 @@
  * Create and edit dates
  *
  * @copyright 2004-2016 The Admidio Team
- * @see http://www.admidio.org/
+ * @see https://www.admidio.org/
  * @license https://www.gnu.org/licenses/gpl-2.0.html GNU General Public License v2.0 only
  *
  * Parameters:
@@ -225,7 +225,7 @@ $datesMenu = $page->getMenu();
 $datesMenu->addItem('menu_item_back', $gNavigation->getPreviousUrl(), $gL10n->get('SYS_BACK'), 'back.png');
 
 // show form
-$form = new HtmlForm('dates_edit_form', $g_root_path.'/adm_program/modules/dates/dates_function.php?dat_id='.$getDateId.'&amp;mode='.$mode.'&amp;copy='.$getCopy, $page);
+$form = new HtmlForm('dates_edit_form', ADMIDIO_URL.'/adm_program/modules/dates/dates_function.php?dat_id='.$getDateId.'&amp;mode='.$mode.'&amp;copy='.$getCopy, $page);
 $form->openGroupBox('gb_title_location', $gL10n->get('SYS_TITLE').' & '.$gL10n->get('DAT_LOCATION'));
     $form->addInput('dat_headline', $gL10n->get('SYS_TITLE'), $date->getValue('dat_headline'), array('maxLength' => 100, 'property' => FIELD_REQUIRED));
 
@@ -273,7 +273,7 @@ $form->closeGroupBox();
 $form->openGroupBox('gb_visibility_registration', $gL10n->get('DAT_VISIBILITY').' & '.$gL10n->get('SYS_REGISTRATION'));
     // add a multiselectbox to the form where the user can choose all roles that should see this event
     // first read all relevant roles from database and create an array with them
-    $sql = 'SELECT *
+    $sql = 'SELECT rol_id, rol_name, cat_name
               FROM '.TBL_ROLES.'
         INNER JOIN '.TBL_CATEGORIES.'
                 ON cat_id = rol_cat_id
@@ -282,16 +282,11 @@ $form->openGroupBox('gb_visibility_registration', $gL10n->get('DAT_VISIBILITY').
                AND (  cat_org_id  = '. $gCurrentOrganization->getValue('org_id'). '
                    OR cat_org_id IS NULL )
           ORDER BY cat_sequence, rol_name';
-    $statement = $gDb->query($sql);
-    $roles = array(array('0', $gL10n->get('SYS_ALL').' ('.$gL10n->get('SYS_ALSO_VISITORS').')', null));
-
-    while($row = $statement->fetch())
-    {
-        $roles[] = array($row['rol_id'], $row['rol_name'], $row['cat_name']);
-    }
-    $form->addSelectBox('date_roles', $gL10n->get('DAT_VISIBLE_TO'), $roles, array('property'     => FIELD_REQUIRED,
-                                                                                   'defaultValue' => $dateRoles,
-                                                                                   'multiselect'  => true));
+    $firstEntry = array('0', $gL10n->get('SYS_ALL').' ('.$gL10n->get('SYS_ALSO_VISITORS').')', null);
+    $form->addSelectBoxFromSql('date_roles', $gL10n->get('DAT_VISIBLE_TO'), $gDb, $sql, array('property'     => FIELD_REQUIRED,
+                                                                                              'defaultValue' => $dateRoles,
+                                                                                              'multiselect'  => true,
+                                                                                              'firstEntry'   => $firstEntry));
 
     $form->addCheckbox('dat_highlight', $gL10n->get('DAT_HIGHLIGHT_DATE'), $date->getValue('dat_highlight'));
 
@@ -316,7 +311,7 @@ $form->openGroupBox('gb_description', $gL10n->get('SYS_DESCRIPTION'), 'admidio-p
     $form->addEditor('dat_description', null, $date->getValue('dat_description'));
 $form->closeGroupBox();
 
-$form->addSubmitButton('btn_save', $gL10n->get('SYS_SAVE'), array('icon' => THEME_PATH.'/icons/disk.png'));
+$form->addSubmitButton('btn_save', $gL10n->get('SYS_SAVE'), array('icon' => THEME_URL.'/icons/disk.png'));
 $form->addHtml(admFuncShowCreateChangeInfoById($date->getValue('dat_usr_id_create'), $date->getValue('dat_timestamp_create'), $date->getValue('dat_usr_id_change'), $date->getValue('dat_timestamp_change')));
 
 // add form to html page and show page

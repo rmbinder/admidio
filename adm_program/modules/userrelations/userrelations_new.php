@@ -4,7 +4,7 @@
  * Create user relations
  *
  * @copyright 2004-2016 The Admidio Team
- * @see http://www.admidio.org/
+ * @see https://www.admidio.org/
  * @license https://www.gnu.org/licenses/gpl-2.0.html GNU General Public License v2.0 only
  *
  * Parameters:
@@ -65,7 +65,7 @@ $relationEditMenu->addItem('menu_item_back', $gNavigation->getPreviousUrl(), $gL
 
 // show form
 $form = new HtmlForm('relation_edit_form',
-                     $g_root_path.'/adm_program/modules/userrelations/userrelations_function.php?usr_id='.$getUsrId.'&amp;mode=1', $page);
+                     ADMIDIO_URL.'/adm_program/modules/userrelations/userrelations_function.php?usr_id='.$getUsrId.'&amp;mode=1', $page);
 
 $form->addInput(
     'usr_id', $gL10n->get('SYS_USER'), $user->getValue('FIRST_NAME').' '.$user->getValue('LAST_NAME'),
@@ -140,9 +140,9 @@ else
                AND usr_valid  = 1
           ORDER BY LAST_NAME.usd_value, FIRST_NAME.usd_value, usr_id';
 }
-$form->addSelectBoxFromSql('usr_id2', $gL10n->get('SYS_MEMBER'), $gDb, $sql, array('property' => FIELD_REQUIRED));
+$form->addSelectBoxFromSql('usr_id2', $gL10n->get('SYS_MEMBER'), $gDb, $sql, array('property' => FIELD_REQUIRED, 'search' => true));
 
-$form->addSubmitButton('btn_save', $gL10n->get('SYS_SAVE'), array('icon' => THEME_PATH.'/icons/disk.png'));
+$form->addSubmitButton('btn_save', $gL10n->get('SYS_SAVE'), array('icon' => THEME_URL.'/icons/disk.png'));
 
 // add form to html page and show page
 $page->addHtml($form->show(false));

@@ -4,7 +4,7 @@
  * Show role members list
  *
  * @copyright 2004-2016 The Admidio Team
- * @see http://www.admidio.org/
+ * @see https://www.admidio.org/
  * @license https://www.gnu.org/licenses/gpl-2.0.html GNU General Public License v2.0 only
  *
  * Parameters:
@@ -233,7 +233,7 @@ else
     $headline = $roleName;
 }
 
-if (count($relationtypeIds) == 1)
+if (count($relationtypeIds) === 1)
 {
     $headline .= ' - '.$relationtypeName;
 }
@@ -285,7 +285,7 @@ if ($getMode !== 'csv')
     }
     elseif ($getMode === 'pdf')
     {
-        require_once(SERVER_PATH.'/adm_program/libs/tcpdf/tcpdf.php');
+        require_once(ADMIDIO_PATH.'/adm_program/libs/tcpdf/tcpdf.php');
         $pdf = new TCPDF($orientation, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
 
         // set document information
@@ -340,7 +340,7 @@ if ($getMode !== 'csv')
         {
             // create filter menu with elements for start-/enddate
             $filterNavbar = new HtmlNavbar('menu_list_filter', null, null, 'filter');
-            $form = new HtmlForm('navbar_filter_form', $g_root_path.'/adm_program/modules/lists/lists_show.php', $page, array('type' => 'navbar', 'setFocus' => false));
+            $form = new HtmlForm('navbar_filter_form', ADMIDIO_URL.'/adm_program/modules/lists/lists_show.php', $page, array('type' => 'navbar', 'setFocus' => false));
             $form->addInput('date_from', $gL10n->get('LST_ROLE_MEMBERSHIP_IN_PERIOD'), $dateFrom, array('type' => 'date', 'maxLength' => 10));
             $form->addInput('date_to', $gL10n->get('LST_ROLE_MEMBERSHIP_TO'), $dateTo, array('type' => 'date', 'maxLength' => 10));
             $form->addInput('lst_id', '', $getListId, array('property' => FIELD_HIDDEN));
@@ -357,13 +357,13 @@ if ($getMode !== 'csv')
                 if($(this).val().length > 1) {
                     var result = $(this).val();
                     $(this).prop("selectedIndex",0);
-                    self.location.href = "'.$g_root_path.'/adm_program/modules/lists/lists_show.php?" +
+                    self.location.href = "'.ADMIDIO_URL.'/adm_program/modules/lists/lists_show.php?" +
                         "lst_id='.$getListId.'&rol_ids='.$getRoleIds.'&mode=" + result + "&show_members='.$getShowMembers.'&date_from='.$getDateFrom.'&date_to='.$getDateTo.'";
                 }
             });
 
             $("#menu_item_print_view").click(function () {
-                window.open("'.$g_root_path.'/adm_program/modules/lists/lists_show.php?lst_id='.$getListId.'&rol_ids='.$getRoleIds.'&mode=print&show_members='.$getShowMembers.'&date_from='.$getDateFrom.'&date_to='.$getDateTo.'", "_blank");
+                window.open("'.ADMIDIO_URL.'/adm_program/modules/lists/lists_show.php?lst_id='.$getListId.'&rol_ids='.$getRoleIds.'&mode=print&show_members='.$getShowMembers.'&date_from='.$getDateFrom.'&date_to='.$getDateTo.'", "_blank");
             });', true);
 
         // get module menu
@@ -373,12 +373,12 @@ if ($getMode !== 'csv')
 
         if ($getFullScreen)
         {
-            $listsMenu->addItem('menu_item_normal_picture', $g_root_path.'/adm_program/modules/lists/lists_show.php?lst_id='.$getListId.'&amp;rol_ids='.$getRoleIds.'&amp;mode=html&amp;show_members='.$getShowMembers.'&amp;full_screen=false&amp;date_from='.$getDateFrom.'&date_to='.$getDateTo.'',
+            $listsMenu->addItem('menu_item_normal_picture', ADMIDIO_URL.'/adm_program/modules/lists/lists_show.php?lst_id='.$getListId.'&amp;rol_ids='.$getRoleIds.'&amp;mode=html&amp;show_members='.$getShowMembers.'&amp;full_screen=false&amp;date_from='.$getDateFrom.'&date_to='.$getDateTo.'',
                 $gL10n->get('SYS_NORMAL_PICTURE'), 'arrow_in.png');
         }
         else
         {
-            $listsMenu->addItem('menu_item_full_screen', $g_root_path.'/adm_program/modules/lists/lists_show.php?lst_id='.$getListId.'&amp;rol_ids='.$getRoleIds.'&amp;mode=html&amp;show_members='.$getShowMembers.'&amp;full_screen=true&amp;date_from='.$getDateFrom.'&date_to='.$getDateTo.'',
+            $listsMenu->addItem('menu_item_full_screen', ADMIDIO_URL.'/adm_program/modules/lists/lists_show.php?lst_id='.$getListId.'&amp;rol_ids='.$getRoleIds.'&amp;mode=html&amp;show_members='.$getShowMembers.'&amp;full_screen=true&amp;date_from='.$getDateFrom.'&date_to='.$getDateTo.'',
                 $gL10n->get('SYS_FULL_SCREEN'), 'arrow_out.png');
         }
 
@@ -387,7 +387,7 @@ if ($getMode !== 'csv')
             // link to assign or remove members if you are allowed to do it
             if ($role->allowedToAssignMembers($gCurrentUser))
             {
-                $listsMenu->addItem('menu_item_assign_members', $g_root_path.'/adm_program/modules/lists/members_assignment.php?rol_id='.$role->getValue('rol_id'),
+                $listsMenu->addItem('menu_item_assign_members', ADMIDIO_URL.'/adm_program/modules/lists/members_assignment.php?rol_id='.$role->getValue('rol_id'),
                     $gL10n->get('SYS_ASSIGN_MEMBERS'), 'add.png');
             }
         }
@@ -563,7 +563,7 @@ foreach ($membersList as $member)
         }
         else
         {
-            $table->setDatatablesColumnsHide(2);
+            $table->setDatatablesColumnsHide(array(2));
         }
     }
 
@@ -596,25 +596,25 @@ foreach ($membersList as $member)
             {
                 // add serial
                 $columnValues[] = $listRowNumber;
-
-                // in html mode we add an additional column with leader/member information to
-                // enable the grouping function of jquery datatables
-                if ($getMode === 'html')
-                {
-                    if ($memberIsLeader)
-                    {
-                        $columnValues[] = $gL10n->get('SYS_LEADERS');
-                    }
-                    else
-                    {
-                        $columnValues[] = $gL10n->get('SYS_PARTICIPANTS');
-                    }
-                }
             }
             else
             {
                 // 1st column may show the serial
                 $csvStr .= $valueQuotes.$listRowNumber.$valueQuotes;
+            }
+
+            // in html mode we add an additional column with leader/member information to
+            // enable the grouping function of jquery datatables
+            if ($getMode === 'html')
+            {
+                if ($memberIsLeader)
+                {
+                    $columnValues[] = $gL10n->get('SYS_LEADERS');
+                }
+                else
+                {
+                    $columnValues[] = $gL10n->get('SYS_PARTICIPANTS');
+                }
             }
         }
 
@@ -628,7 +628,7 @@ foreach ($membersList as $member)
             /*****************************************************************/
             // in some cases the content must have a special output format
             /*****************************************************************/
-            if ($usfId > 0 && $usfId == $gProfileFields->getProperty('COUNTRY', 'usf_id'))
+            if ($usfId > 0 && $usfId === (int) $gProfileFields->getProperty('COUNTRY', 'usf_id'))
             {
                 $content = $gL10n->getCountryByCode($member[$sqlColumnNumber]);
             }
@@ -637,7 +637,7 @@ foreach ($membersList as $member)
                 // show user photo
                 if ($getMode === 'html' || $getMode === 'print')
                 {
-                    $content = '<img src="'.$g_root_path.'/adm_program/modules/profile/profile_photo_show.php?usr_id='.$member['usr_id'].'" style="vertical-align: middle;" alt="'.$gL10n->get('LST_USER_PHOTO').'" />';
+                    $content = '<img src="'.ADMIDIO_URL.'/adm_program/modules/profile/profile_photo_show.php?usr_id='.$member['usr_id'].'" style="vertical-align: middle;" alt="'.$gL10n->get('LST_USER_PHOTO').'" />';
                 }
                 if ($getMode === 'csv' && $member[$sqlColumnNumber] != null)
                 {
@@ -656,6 +656,10 @@ foreach ($membersList as $member)
                     {
                         $content = $gL10n->get('SYS_NO');
                     }
+                }
+                elseif($content != 1)
+                {
+                    $content = 0;
                 }
             }
             elseif ($gProfileFields->getPropertyById($usfId, 'usf_type') === 'DATE'
@@ -691,14 +695,15 @@ foreach ($membersList as $member)
             {
                 // firstname and lastname get a link to the profile
                 if ($getMode === 'html'
-                &&    ($usfId == $gProfileFields->getProperty('LAST_NAME', 'usf_id')
-                    || $usfId == $gProfileFields->getProperty('FIRST_NAME', 'usf_id')))
+                &&    ($usfId === (int) $gProfileFields->getProperty('LAST_NAME', 'usf_id')
+                    || $usfId === (int) $gProfileFields->getProperty('FIRST_NAME', 'usf_id')))
                 {
                     $htmlValue = $gProfileFields->getHtmlValue($gProfileFields->getPropertyById($usfId, 'usf_name_intern'), $content, $member['usr_id']);
-                    $columnValues[] = '<a href="'.$g_root_path.'/adm_program/modules/profile/profile.php?user_id='.$member['usr_id'].'">'.$htmlValue.'</a>';
+                    $columnValues[] = '<a href="'.ADMIDIO_URL.'/adm_program/modules/profile/profile.php?user_id='.$member['usr_id'].'">'.$htmlValue.'</a>';
                 }
                 else
                 {
+                    // within print mode no links should be set
                     if ($getMode === 'print'
                     &&    ($gProfileFields->getPropertyById($usfId, 'usf_type') === 'EMAIL'
                         || $gProfileFields->getPropertyById($usfId, 'usf_type') === 'PHONE'
@@ -708,7 +713,15 @@ foreach ($membersList as $member)
                     }
                     else
                     {
-                        $columnValues[] = $gProfileFields->getHtmlValue($gProfileFields->getPropertyById($usfId, 'usf_name_intern'), $content, $member['usr_id']);
+                        // checkbox must set a sorting value
+                        if($gProfileFields->getPropertyById($usfId, 'usf_type') === 'CHECKBOX')
+                        {
+                            $columnValues[] = array('value' => $gProfileFields->getHtmlValue($gProfileFields->getPropertyById($usfId, 'usf_name_intern'), $content, $member['usr_id']), 'order' => $content);
+                        }
+                        else
+                        {
+                            $columnValues[] = $gProfileFields->getHtmlValue($gProfileFields->getPropertyById($usfId, 'usf_name_intern'), $content, $member['usr_id']);
+                        }
                     }
                 }
             }
@@ -776,14 +789,14 @@ elseif ($getMode === 'pdf')
     $pdf->writeHTML($table->getHtmlTable(), true, false, true, false, '');
 
     // Save PDF to file
-    $pdf->Output(SERVER_PATH.'/adm_my_files/'.$filename, 'F');
+    $pdf->Output(ADMIDIO_PATH.'/adm_my_files/'.$filename, 'F');
 
     // Redirect
     header('Content-Type: application/pdf');
 
-    readfile(SERVER_PATH.'/adm_my_files/'.$filename);
+    readfile(ADMIDIO_PATH.'/adm_my_files/'.$filename);
     ignore_user_abort(true);
-    unlink(SERVER_PATH.'/adm_my_files/'.$filename);
+    unlink(ADMIDIO_PATH.'/adm_my_files/'.$filename);
 }
 elseif ($getMode === 'html' || $getMode === 'print')
 {
@@ -823,18 +836,17 @@ elseif ($getMode === 'html' || $getMode === 'print')
             }
 
             // Event
+            $value = '';
+            if ($role->getValue('rol_weekday') > 0)
+            {
+                $value = DateTimeExtended::getWeekdays($role->getValue('rol_weekday')).' ';
+            }
+            if (strlen($role->getValue('rol_start_time')) > 0)
+            {
+                $value = $gL10n->get('LST_FROM_TO', $role->getValue('rol_start_time', $gPreferences['system_time']), $role->getValue('rol_end_time', $gPreferences['system_time']));
+            }
             if ($role->getValue('rol_weekday') > 0 || strlen($role->getValue('rol_start_time')) > 0)
             {
-                $value = '';
-                if ($role->getValue('rol_weekday') > 0)
-                {
-                    $value = DateTimeExtended::getWeekdays($role->getValue('rol_weekday')).' ';
-                }
-                if (strlen($role->getValue('rol_start_time')) > 0)
-                {
-                    $value = $gL10n->get('LST_FROM_TO', $role->getValue('rol_start_time', $gPreferences['system_time']), $role->getValue('rol_end_time', $gPreferences['system_time']));
-                }
-
                 $form->addStaticControl('infobox_date', $gL10n->get('DAT_DATE'), $value);
             }
 

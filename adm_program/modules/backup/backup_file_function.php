@@ -4,7 +4,7 @@
  * Backup
  *
  * @copyright 2004-2016 The Admidio Team
- * @see http://www.admidio.org/
+ * @see https://www.admidio.org/
  * @license https://www.gnu.org/licenses/gpl-2.0.html GNU General Public License v2.0 only
  *
  * Parameters:
@@ -28,7 +28,7 @@ if(!$gCurrentUser->isAdministrator())
     // => EXIT
 }
 
-$backupAbsolutePath = SERVER_PATH. '/adm_my_files/backup/'; // make sure to include trailing slash
+$backupAbsolutePath = ADMIDIO_PATH. '/adm_my_files/backup/'; // make sure to include trailing slash
 
 // kompletten Pfad der Datei holen
 $completePath = $backupAbsolutePath.$getFilename;

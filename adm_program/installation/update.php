@@ -4,7 +4,7 @@
  * Handle update of Admidio database to a new version
  *
  * @copyright 2004-2016 The Admidio Team
- * @see http://www.admidio.org/
+ * @see https://www.admidio.org/
  * @license https://www.gnu.org/licenses/gpl-2.0.html GNU General Public License v2.0 only
  *
  * Parameters:
@@ -37,53 +37,31 @@ else
     exit();
 }
 
-if($g_tbl_praefix === '')
-{
-    // default praefix is "adm" because of compatibility to older versions
-    $g_tbl_praefix = 'adm';
-}
-
-// if there is no debug flag in config.php than set debug to false
-if(!isset($gDebug) || !$gDebug)
-{
-    $gDebug = 0;
-}
-
-require_once(substr(__FILE__, 0, strpos(__FILE__, 'adm_program')-1).'/adm_program/system/constants.php');
+require_once(substr(__FILE__, 0, strpos(__FILE__, 'adm_program') - 1) . '/adm_program/system/init_globals.php');
+require_once(substr(__FILE__, 0, strpos(__FILE__, 'adm_program') - 1) . '/adm_program/system/constants.php');
 
 // check PHP version and show notice if version is too low
-if(version_compare(phpversion(), MIN_PHP_VERSION) === -1)
+if(version_compare(phpversion(), MIN_PHP_VERSION, '<'))
 {
     exit('<div style="color: #cc0000;">Error: Your PHP version '.phpversion().' does not fulfill
         the minimum requirements for this Admidio version. You need at least PHP '.MIN_PHP_VERSION.' or higher.</div>');
 }
 
-require_once('install_functions.php');
-require_once(SERVER_PATH.'/adm_program/system/string.php');
-require_once(SERVER_PATH.'/adm_program/system/function.php');
+require_once(ADMIDIO_PATH . '/adm_program/installation/install_functions.php');
+require_once(ADMIDIO_PATH . '/adm_program/system/function.php');
+require_once(ADMIDIO_PATH . '/adm_program/system/string.php');
+require_once(ADMIDIO_PATH . '/adm_program/system/logging.php');
 
 // Initialize and check the parameters
 
-define('THEME_PATH', 'layout');
+define('THEME_URL', 'layout');
 $getMode = admFuncVariableIsValid($_GET, 'mode', 'int', array('defaultValue' => 1));
 $message = '';
-
-// set default password-hash algorithm
-if (!isset($gPasswordHashAlgorithm))
-{
-    $gPasswordHashAlgorithm = 'DEFAULT';
-}
-
-// Default-DB-Type ist immer MySql
-if(!isset($gDbType))
-{
-    $gDbType = 'mysql';
-}
 
 // connect to database
 try
 {
-    $gDb = new Database($gDbType, $g_adm_srv, null, $g_adm_db, $g_adm_usr, $g_adm_pw);
+    $gDb = new Database($gDbType, $g_adm_srv, $g_adm_port, $g_adm_db, $g_adm_usr, $g_adm_pw);
 }
 catch(AdmException $e)
 {
@@ -129,7 +107,7 @@ if(is_file('../../config.php') && is_file('../../adm_my_files/config.php'))
     // try to delete the config file at the old place otherwise show notice to user
     if(!@unlink('../../config.php'))
     {
-        showNotice($gL10n->get('INS_DELETE_CONFIG_FILE', $g_root_path), $g_root_path.'/adm_program/installation/index.php',
+        showNotice($gL10n->get('INS_DELETE_CONFIG_FILE', ADMIDIO_URL), ADMIDIO_URL.'/adm_program/installation/index.php',
                    $gL10n->get('SYS_OVERVIEW'), 'layout/application_view_list.png');
     }
 }
@@ -139,7 +117,7 @@ $message = checkDatabaseVersion($gDb);
 
 if($message !== '')
 {
-    showNotice($message, $g_root_path.'/adm_program/index.php',
+    showNotice($message, ADMIDIO_URL.'/adm_program/index.php',
                $gL10n->get('SYS_OVERVIEW'), 'layout/application_view_list.png');
 }
 
@@ -188,7 +166,7 @@ if($installedDbVersion === '')
             <strong>'.$gL10n->get('INS_UPDATE_NOT_POSSIBLE').'</strong>
         </div>
         <p>'.$gL10n->get('INS_NO_INSTALLED_VERSION_FOUND', ADMIDIO_VERSION_TEXT).'</p>';
-    showNotice($message, $g_root_path.'/adm_program/index.php',
+    showNotice($message, ADMIDIO_URL.'/adm_program/index.php',
                $gL10n->get('SYS_OVERVIEW'), 'layout/application_view_list.png', true);
 }
 
@@ -196,8 +174,8 @@ if($getMode === 1)
 {
     // if database version is smaller then source version -> update
     // if database version is equal to source but beta has a difference -> update
-    if(version_compare($installedDbVersion, ADMIDIO_VERSION_TEXT) === -1
-    ||(version_compare($installedDbVersion, ADMIDIO_VERSION_TEXT) === 0 && $maxUpdateStep > $currentUpdateStep))
+    if (version_compare($installedDbVersion, ADMIDIO_VERSION_TEXT, '<')
+    || (version_compare($installedDbVersion, ADMIDIO_VERSION_TEXT, '==') && $maxUpdateStep > $currentUpdateStep))
     {
         // create a page with the notice that the installation must be configured on the next pages
         $form = new HtmlFormInstallation('update_login_form', 'update.php?mode=2');
@@ -225,7 +203,7 @@ if($getMode === 1)
         echo $form->show();
     }
     // if versions are equal > no update
-    elseif(version_compare($installedDbVersion, ADMIDIO_VERSION_TEXT) === 0 && $maxUpdateStep === $currentUpdateStep)
+    elseif(version_compare($installedDbVersion, ADMIDIO_VERSION_TEXT, '==') && $maxUpdateStep === $currentUpdateStep)
     {
         $message = '
             <div class="alert alert-success form-alert">
@@ -233,7 +211,7 @@ if($getMode === 1)
                 <strong>'.$gL10n->get('INS_DATABASE_IS_UP_TO_DATE').'</strong>
             </div>
             <p>'.$gL10n->get('INS_DATABASE_DOESNOT_NEED_UPDATED').'</p>';
-        showNotice($message, $g_root_path.'/adm_program/index.php',
+        showNotice($message, ADMIDIO_URL.'/adm_program/index.php',
                    $gL10n->get('SYS_OVERVIEW'), 'layout/application_view_list.png', true);
     }
     // if source version smaller then database -> show error
@@ -244,10 +222,10 @@ if($getMode === 1)
                 <span class="glyphicon glyphicon-exclamation-sign"></span>
                 <strong>'.$gL10n->get('SYS_ERROR').'</strong>
                 <p>'.$gL10n->get('SYS_FILESYSTEM_VERSION_INVALID', $installedDbVersion, ADMIDIO_VERSION_TEXT, '
-                    <a href="http://www.admidio.org/index.php?page=download">', '</a>').'
+                    <a href="'.ADMIDIO_HOMEPAGE.'download.php">', '</a>').'
                 </p>
             </div>';
-        showNotice($message, $g_root_path.'/adm_program/index.php',
+        showNotice($message, ADMIDIO_URL.'/adm_program/index.php',
                    $gL10n->get('SYS_OVERVIEW'), 'layout/application_view_list.png', true);
     }
 }
@@ -306,11 +284,12 @@ elseif($getMode === 2)
     // allerdings darf hier keine Fehlermeldung wg. dem safe_mode kommen
     @set_time_limit(300);
 
-    $mainVersion     = (int) substr($installedDbVersion, 0, 1);
-    $subVersion      = (int) substr($installedDbVersion, 2, 1);
-    $microVersion    = (int) substr($installedDbVersion, 4, 1);
+    preg_match('/^(\d+)\.(\d+)\.(\d+)/', $installedDbVersion, $versionArray);
+    $versionArray = array_map('intval', $versionArray);
+    list(, $versionMain, $versionMinor, $versionPatch) = $versionArray;
+
     $flagNextVersion = true;
-    ++$microVersion;
+    ++$versionPatch;
 
     // erst einmal die evtl. neuen Orga-Einstellungen in DB schreiben
     require_once('db_scripts/preferences.php');
@@ -340,59 +319,54 @@ elseif($getMode === 2)
         $gDb->query($sql);
     }
 
-    // before version 3 we had an other update mechanism which will be handled here
-    if($mainVersion < 3)
+    // in version 2 we had an other update mechanism which will be handled here
+    if($versionMain === 2)
     {
         // nun in einer Schleife die Update-Scripte fuer alle Versionen zwischen der Alten und Neuen einspielen
         while($flagNextVersion)
         {
             $flagNextVersion = false;
 
-            if($mainVersion < 3)
+            if($versionMain === 2)
             {
-                // until version 3 Admidio had sql and php files where the update statements where stored
+                // version 2 Admidio had sql and php files where the update statements where stored
                 // these files must be executed
 
                 // in der Schleife wird geschaut ob es Scripte fuer eine Microversion (3.Versionsstelle) gibt
                 // Microversion 0 sollte immer vorhanden sein, die anderen in den meisten Faellen nicht
-                for($microVersion; $microVersion < 15; ++$microVersion)
+                for($versionPatch; $versionPatch < 15; ++$versionPatch)
                 {
-                    $version = $mainVersion.'_'.$subVersion.'_'.$microVersion;
-
-                    // Update-Datei der naechsten hoeheren Version ermitteln
-                    $sqlUpdateFile = 'db_scripts/upd_'. $version. '_db.sql';
-                    $phpUpdateFile = 'db_scripts/upd_'. $version. '_conv.php';
+                    $version = $versionMain . '_' . $versionMinor . '_' . $versionPatch;
 
                     // output of the version number for better debugging
-                    if($gDebug)
-                    {
-                        error_log('Update to version '.$version);
-                    }
+                    $gLogger->info('Update to version ' . $version);
 
-                    if(is_file($sqlUpdateFile))
-                    {
-                        // SQL-Script abarbeiten
-                        $file    = fopen($sqlUpdateFile, 'r')
-                                   or showNotice($gL10n->get('INS_ERROR_OPEN_FILE', $sqlUpdateFile), 'update.php',
-                                                 $gL10n->get('SYS_BACK'), 'layout/back.png', true);
-                        $content = fread($file, filesize($sqlUpdateFile));
-                        $sql_arr = explode(';', $content);
-                        fclose($file);
+                    $dbScriptsPath = ADMIDIO_PATH . '/adm_program/installation/db_scripts/';
+                    $sqlFileName = 'upd_' . $version . '_db.sql';
+                    $phpFileName = 'upd_' . $version . '_conv.php';
 
-                        foreach($sql_arr as $sql)
+                    if (is_file($dbScriptsPath . $sqlFileName))
+                    {
+                        $sqlQueryResult = querySqlFile($gDb, $sqlFileName);
+
+                        if ($sqlQueryResult === true)
                         {
-                            if(trim($sql) !== '')
-                            {
-                                // replace prefix with installation specific table prefix
-                                $sql = str_replace('%PREFIX%', $g_tbl_praefix, $sql);
-                                // now execute update sql
-                                $gDb->query($sql);
-                            }
+                            $flagNextVersion = true;
                         }
-
-                        $flagNextVersion = true;
+                        else
+                        {
+                            showNotice(
+                                $sqlQueryResult,
+                                'update.php',
+                                $gL10n->get('SYS_BACK'),
+                                'layout/back.png',
+                                true
+                            );
+                            // => EXIT
+                        }
                     }
 
+                    $phpUpdateFile = $dbScriptsPath . $phpFileName;
                     // check if an php update file exists and then execute the script
                     if(is_file($phpUpdateFile))
                     {
@@ -403,35 +377,29 @@ elseif($getMode === 2)
 
                 // keine Datei mit der Microversion gefunden, dann die Main- oder Subversion hochsetzen,
                 // solange bis die aktuelle Versionsnummer erreicht wurde
-                if(!$flagNextVersion && version_compare($mainVersion.'.'.$subVersion.'.'.$microVersion, ADMIDIO_VERSION) === -1)
+                if(!$flagNextVersion && version_compare($versionMain.'.'.$versionMinor.'.'.$versionPatch, ADMIDIO_VERSION, '<'))
                 {
-                    if($subVersion === 4) // we do not have more then 4 subversions with old updater
+                    if($versionMinor === 4) // we do not have more then 4 subversions with old updater
                     {
-                        ++$mainVersion;
-                        $subVersion = 0;
+                        ++$versionMain;
+                        $versionMinor = 0;
                     }
                     else
                     {
-                        ++$subVersion;
+                        ++$versionMinor;
                     }
 
-                    $microVersion    = 0;
+                    $versionPatch = 0;
                     $flagNextVersion = true;
                 }
             }
         }
     }
 
-    if($gDbType === 'pgsql' || $gDbType === 'postgresql') // for backwards compatibility "postgresql"
-    {
-        // soundex is not a default function in PostgreSQL
-        $sql = 'UPDATE '.TBL_PREFERENCES.' SET prf_value = \'0\'
-                 WHERE prf_name LIKE \'system_search_similar\'';
-        $gDb->query($sql);
-    }
+    disableSoundexSearchIfPgsql($gDb);
 
     // since version 3 we do the update with xml files and a new class model
-    if($mainVersion >= 3)
+    if($versionMain >= 3)
     {
         // set system user as current user, but this user only exists since version 3
         $sql = 'SELECT usr_id FROM '.TBL_USERS.' WHERE usr_login_name = \''.$gL10n->get('SYS_SYSTEM').'\' ';
@@ -458,8 +426,8 @@ elseif($getMode === 2)
     $gDb->query($sql);
 
     // create an installation unique cookie prefix and remove special characters
-    $gCookiePraefix = 'ADMIDIO_'.$g_organization.'_'.$g_adm_db.'_'.$g_tbl_praefix;
-    $gCookiePraefix = strtr($gCookiePraefix, ' .,;:[]', '_______');
+    $gCookiePraefix = 'ADMIDIO_' . $g_organization . '_' . $g_adm_db . '_' . $g_tbl_praefix;
+    $gCookiePraefix = str_replace(array(' ', '.', ',', ';', ':', '[', ']'), '_', $gCookiePraefix);
 
     // start php session and remove session object with all data, so that
     // all data will be read after the update
@@ -468,7 +436,7 @@ elseif($getMode === 2)
     unset($_SESSION['gCurrentSession']);
 
     // show notice that update was successful
-    $form = new HtmlFormInstallation('installation-form', 'http://www.admidio.org/index.php?page=donate');
+    $form = new HtmlFormInstallation('installation-form', ADMIDIO_HOMEPAGE.'donate.php');
     $form->setUpdateModus();
     $form->setFormDescription($gL10n->get('INS_UPDATE_TO_VERSION_SUCCESSFUL', ADMIDIO_VERSION_TEXT).'<br /><br />'.$gL10n->get('INS_SUPPORT_FURTHER_DEVELOPMENT'), '<div class="alert alert-success form-alert"><span class="glyphicon glyphicon-ok"></span><strong>'.$gL10n->get('INS_UPDATING_WAS_SUCCESSFUL').'</strong></div>');
     $form->openButtonGroup();

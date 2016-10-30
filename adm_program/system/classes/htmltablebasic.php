@@ -2,7 +2,7 @@
 /**
  ***********************************************************************************************
  * @copyright 2004-2016 The Admidio Team
- * @see http://www.admidio.org/
+ * @see https://www.admidio.org/
  * @license https://www.gnu.org/licenses/gpl-2.0.html GNU General Public License v2.0 only
  ***********************************************************************************************
  */
@@ -136,7 +136,7 @@ class HtmlTableBasic extends HtmlElement {
         $this->columnCount  = 0;
         $this->rowCount     = 0;
 
-        parent::__construct('table', '', '', true);
+        parent::__construct('table');
 
         if ($id !== null)
         {

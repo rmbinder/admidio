@@ -4,7 +4,7 @@
  * Create and edit relation types
  *
  * @copyright 2004-2016 The Admidio Team
- * @see http://www.admidio.org/
+ * @see https://www.admidio.org/
  * @license https://www.gnu.org/licenses/gpl-2.0.html GNU General Public License v2.0 only
  *
  * Parameters:
@@ -51,7 +51,7 @@ $relationtypeEditMenu->addItem('menu_item_back', $gNavigation->getPreviousUrl(),
 
 // show form
 $form = new HtmlForm('relationtype_edit_form',
-                     $g_root_path.'/adm_program/modules/userrelations/relationtypes_function.php?urt_id='.$getUrtId.'&amp;mode=1', $page);
+                     ADMIDIO_URL.'/adm_program/modules/userrelations/relationtypes_function.php?urt_id='.$getUrtId.'&amp;mode=1', $page);
 
 $form->addInput(
     'urt_name', $gL10n->get('REL_USER_RELATION_TYPE_FORWARD'), $relationtype1->getValue('urt_name'),
@@ -127,7 +127,7 @@ $form->addInput(
     array('maxLength' => 100)
 );
 
-$form->addSubmitButton('btn_save', $gL10n->get('SYS_SAVE'), array('icon' => THEME_PATH.'/icons/disk.png'));
+$form->addSubmitButton('btn_save', $gL10n->get('SYS_SAVE'), array('icon' => THEME_URL.'/icons/disk.png'));
 $form->addHtml(admFuncShowCreateChangeInfoById(
     $relationtype1->getValue('urt_usr_id_create'),
     $relationtype1->getValue('urt_timestamp_create'),

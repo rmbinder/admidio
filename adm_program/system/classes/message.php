@@ -2,7 +2,7 @@
 /**
  ***********************************************************************************************
  * @copyright 2004-2016 The Admidio Team
- * @see http://www.admidio.org/
+ * @see https://www.admidio.org/
  * @license https://www.gnu.org/licenses/gpl-2.0.html GNU General Public License v2.0 only
  ***********************************************************************************************
  */
@@ -22,11 +22,11 @@
  * $gMessage->show($gL10n->get('SYS_MESSAGE_TEXT_ID'));
  *
  * // show a message and set a link to a page that should be shown after user click ok
- * $gMessage->setForwardUrl('http://www.example.de/mypage.php');
+ * $gMessage->setForwardUrl('https://www.example.com/mypage.php');
  * $gMessage->show($gL10n->get('SYS_MESSAGE_TEXT_ID'));
  *
  * // show a message with yes and no button and set a link to a page that should be shown after user click yes
- * $gMessage->setForwardYesNo('http://www.example.de/mypage.php');
+ * $gMessage->setForwardYesNo('https://www.example.com/mypage.php');
  * $gMessage->show($gL10n->get('SYS_MESSAGE_TEXT_ID')); @endcode
  */
 class Message
@@ -162,11 +162,11 @@ class Message
                 {
                     $htmlButtons .= '
                         <button id="admButtonYes" class="btn" type="button" onclick="self.location.href=\''. $this->forwardUrl. '\'">
-                            <img src="'. THEME_PATH. '/icons/ok.png" alt="'.$gL10n->get('SYS_YES').'" />
+                            <img src="'. THEME_URL. '/icons/ok.png" alt="'.$gL10n->get('SYS_YES').'" />
                             &nbsp;&nbsp;'.$gL10n->get('SYS_YES').'&nbsp;&nbsp;&nbsp;
                         </button>
                         <button id="admButtonNo" class="btn" type="button" onclick="history.back()">
-                            <img src="'. THEME_PATH. '/icons/error.png" alt="'.$gL10n->get('SYS_NO').'" />
+                            <img src="'. THEME_URL. '/icons/error.png" alt="'.$gL10n->get('SYS_NO').'" />
                             &nbsp;'.$gL10n->get('SYS_NO').'
                         </button>';
                 }
@@ -175,7 +175,7 @@ class Message
                     // Wenn weitergeleitet wird, dann auch immer einen Weiter-Button anzeigen
                     $htmlButtons .= '
                         <a class="btn" href="'. $this->forwardUrl. '">'.$gL10n->get('SYS_NEXT').'
-                            <img src="'. THEME_PATH. '/icons/forward.png" alt="'.$gL10n->get('SYS_NEXT').'"
+                            <img src="'. THEME_URL. '/icons/forward.png" alt="'.$gL10n->get('SYS_NEXT').'"
                                 title="'.$gL10n->get('SYS_NEXT').'" />
                         </a>';
                 }
@@ -187,8 +187,8 @@ class Message
                 if(!$this->modalWindowMode)
                 {
                     $htmlButtons .= '
-                        <a class="btn" href="javascript:history.back()">
-                            <img src="'.THEME_PATH.'/icons/back.png" alt="'.$gL10n->get('SYS_BACK').'"
+                        <a class="btn" href="javascript:void(0)" onclick="history.back()">
+                            <img src="'.THEME_URL.'/icons/back.png" alt="'.$gL10n->get('SYS_BACK').'"
                                 title="'.$gL10n->get('SYS_BACK').'" />'.
                             $gL10n->get('SYS_BACK').
                         '</a>';

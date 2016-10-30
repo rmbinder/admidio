@@ -2,7 +2,7 @@
 /**
  ***********************************************************************************************
  * @copyright 2004-2016 The Admidio Team
- * @see http://www.admidio.org/
+ * @see https://www.admidio.org/
  * @license https://www.gnu.org/licenses/gpl-2.0.html GNU General Public License v2.0 only
  ***********************************************************************************************
  */
@@ -19,7 +19,7 @@
  * @code // create object and read the value of the language preference
  * $organization = new Organization($gDb, $organizationId);
  * $preferences  = $organization->getPreferences();
- * $language     = $preferences['system_language'];
+ * $language     = $gPreferences['system_language'];
  * // language = 'de' @endcode
  ***********************************************************************************************
  */
@@ -132,6 +132,8 @@ class Organization extends TableAccess
                                              , ('.$orgId.', \'ROL\', \'TEAMS\',    \'INS_TEAMS\',    0, 0, 0, 4, '.$systemUserId.', \''.DATETIME_NOW.'\')
                                              , ('.$orgId.', \'LNK\', \'COMMON\',   \'SYS_COMMON\',   0, 1, 0, 1, '.$systemUserId.', \''.DATETIME_NOW.'\')
                                              , ('.$orgId.', \'LNK\', \'INTERN\',   \'INS_INTERN\',   1, 0, 0, 2, '.$systemUserId.', \''.DATETIME_NOW.'\')
+                                             , ('.$orgId.', \'ANN\', \'COMMON\',   \'SYS_COMMON\',   0, 1, 0, 1, '.$systemUserId.', \''.DATETIME_NOW.'\')
+                                             , ('.$orgId.', \'ANN\', \'IMPORTANT\',   \'INS_IMPORTANT\',0, 0, 0, 2, '.$systemUserId.', \''.DATETIME_NOW.'\')
                                              , ('.$orgId.', \'DAT\', \'COMMON\',   \'SYS_COMMON\',   0, 1, 0, 1, '.$systemUserId.', \''.DATETIME_NOW.'\')
                                              , ('.$orgId.', \'DAT\', \'TRAINING\', \'INS_TRAINING\', 0, 0, 0, 2, '.$systemUserId.', \''.DATETIME_NOW.'\')
                                              , ('.$orgId.', \'DAT\', \'COURSES\',  \'INS_COURSES\',  0, 0, 0, 3, '.$systemUserId.', \''.DATETIME_NOW.'\')';
@@ -221,7 +223,7 @@ class Organization extends TableAccess
         // set addresslist to default configuration
         $sql = 'UPDATE '.TBL_PREFERENCES.' SET prf_value = \''.$addressList->getValue('lst_id').'\'
                  WHERE prf_org_id = '.$orgId.'
-                   AND prf_name   = \'lists_default_configuation\' ';
+                   AND prf_name   = \'lists_default_configuration\' ';
         $this->db->query($sql);
 
         $phoneList = new ListConfiguration($this->db);

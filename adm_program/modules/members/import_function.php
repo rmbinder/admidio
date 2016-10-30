@@ -4,7 +4,7 @@
  * Prepare values of import form for further processing
  *
  * @copyright 2004-2016 The Admidio Team
- * @see http://www.admidio.org/
+ * @see https://www.admidio.org/
  * @license https://www.gnu.org/licenses/gpl-2.0.html GNU General Public License v2.0 only
  ***********************************************************************************************
  */
@@ -31,7 +31,7 @@ if(strlen($_FILES['userfile']['tmp_name'][0]) === 0)
     $gMessage->show($gL10n->get('SYS_FIELD_EMPTY', $gL10n->get('SYS_FILE')));
     // => EXIT
 }
-elseif($_FILES['userfile']['error'][0] == 1)
+elseif($_FILES['userfile']['error'][0] === UPLOAD_ERR_INI_SIZE)
 {
     // Dateigroesse ueberpruefen Servereinstellungen
     $gMessage->show($gL10n->get('SYS_FILE_TO_LARGE_SERVER', $gPreferences['max_file_upload_size']));
@@ -70,5 +70,5 @@ if($postImportCoding === 'iso-8859-1')
 }
 
 // CSV-Import (im Moment gibt es nur diesen, spaeter muss hier dann unterschieden werden)
-header('Location: '.$g_root_path.'/adm_program/modules/members/import_csv_config.php');
+header('Location: '.ADMIDIO_URL.'/adm_program/modules/members/import_csv_config.php');
 exit();

@@ -4,7 +4,7 @@
  * Several functions for announcement module
  *
  * @copyright 2004-2016 The Admidio Team
- * @see http://www.admidio.org/
+ * @see https://www.admidio.org/
  * @license https://www.gnu.org/licenses/gpl-2.0.html GNU General Public License v2.0 only
  *
  * Parameters:
@@ -110,7 +110,7 @@ if($getMode === 1)
 elseif($getMode === 2)
 {
     // Ankuendigung loeschen, wenn diese zur aktuellen Orga gehoert
-    if($announcement->getValue('ann_org_id') == $gCurrentOrganization->getValue('org_id'))
+    if($announcement->getValue('cat_org_id') == $gCurrentOrganization->getValue('org_id'))
     {
         $announcement->delete();
 

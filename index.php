@@ -4,33 +4,21 @@
  * Set the correct startpage for Admidio
  *
  * @copyright 2004-2016 The Admidio Team
- * @see http://www.admidio.org/
+ * @see https://www.admidio.org/
  * @license https://www.gnu.org/licenses/gpl-2.0.html GNU General Public License v2.0 only
  ***********************************************************************************************
  */
 if(is_file('adm_my_files/config.php'))
 {
     require_once('adm_my_files/config.php');
-
-    // default prefix is set to 'adm' because of compatibility to old versions
-    if(!isset($g_tbl_praefix))
-    {
-        $g_tbl_praefix = 'adm';
-    }
-
-    // create database object and establish connection to database
-    if(!isset($gDbType))
-    {
-        $gDbType = 'mysql';
-    }
-
+    require_once('adm_program/system/init_globals.php');
     require_once('adm_program/system/constants.php');
     require_once('adm_program/system/function.php');
 
     // connect to database
     try
     {
-        $gDb = new Database($gDbType, $g_adm_srv, null, $g_adm_db, $g_adm_usr, $g_adm_pw);
+        $gDb = new Database($gDbType, $g_adm_srv, $g_adm_port, $g_adm_db, $g_adm_usr, $g_adm_pw);
     }
     catch(AdmException $e)
     {

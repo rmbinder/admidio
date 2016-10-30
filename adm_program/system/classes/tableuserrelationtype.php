@@ -4,7 +4,7 @@
  * Class manages access to database table adm_user_relation_types
  *
  * @copyright 2004-2016 The Admidio Team
- * @see http://www.admidio.org/
+ * @see https://www.admidio.org/
  * @license https://www.gnu.org/licenses/gpl-2.0.html GNU General Public License v2.0 only
  ***********************************************************************************************
  */
@@ -33,7 +33,8 @@ class TableUserRelationType extends TableAccess
     {
         if (!$this->isNewRecord())
         {
-            if ($this->getValue('urt_id_inverse') === null)
+            $urtIdReverse = $this->getValue('urt_id_inverse');
+            if (empty($urtIdReverse))
             {
                 return 'unidirectional';
             }

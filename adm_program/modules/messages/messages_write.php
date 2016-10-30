@@ -4,7 +4,7 @@
  * messages form page
  *
  * @copyright 2004-2016 The Admidio Team
- * @see http://www.admidio.org/
+ * @see https://www.admidio.org/
  * @license https://www.gnu.org/licenses/gpl-2.0.html GNU General Public License v2.0 only
  ***********************************************************************************************
  */
@@ -57,7 +57,7 @@ if (!$gValidLogin && $getUserId === 0 && $getMsgType === 'PM')
 // check if user has email address for sending a email
 if ($gValidLogin && $getMsgType !== 'PM' && $gCurrentUser->getValue('EMAIL') === '')
 {
-    $gMessage->show($gL10n->get('SYS_CURRENT_USER_NO_EMAIL', '<a href="'.$g_root_path.'/adm_program/modules/profile/profile.php">', '</a>'));
+    $gMessage->show($gL10n->get('SYS_CURRENT_USER_NO_EMAIL', '<a href="'.ADMIDIO_URL.'/adm_program/modules/profile/profile.php">', '</a>'));
     // => EXIT
 }
 
@@ -200,7 +200,7 @@ if ($getMsgType === 'PM')
     }
 
     // show form
-    $form = new HtmlForm('pm_send_form', $g_root_path.'/adm_program/modules/messages/messages_send.php?'.$formParam, $page, array('enableFileUpload' => true));
+    $form = new HtmlForm('pm_send_form', ADMIDIO_URL.'/adm_program/modules/messages/messages_send.php?'.$formParam, $page, array('enableFileUpload' => true));
 
     if ($getUserId === 0)
     {
@@ -233,7 +233,7 @@ if ($getMsgType === 'PM')
 
     $form->closeGroupBox();
 
-    $form->addSubmitButton('btn_send', $gL10n->get('SYS_SEND'), array('icon' => THEME_PATH.'/icons/email.png'));
+    $form->addSubmitButton('btn_send', $gL10n->get('SYS_SEND'), array('icon' => THEME_URL.'/icons/email.png'));
 
     // add form to html page
     $page->addHtml($form->show(false));
@@ -278,7 +278,7 @@ elseif (!isset($messageStatement))
     }
 
     // show form
-    $form = new HtmlForm('mail_send_form', $g_root_path.'/adm_program/modules/messages/messages_send.php?'.$formParam, $page, array('enableFileUpload' => true));
+    $form = new HtmlForm('mail_send_form', ADMIDIO_URL.'/adm_program/modules/messages/messages_send.php?'.$formParam, $page, array('enableFileUpload' => true));
     $form->openGroupBox('gb_mail_contact_details', $gL10n->get('SYS_CONTACT_DETAILS'));
 
     $preloadData = array();
@@ -406,7 +406,7 @@ elseif (!isset($messageStatement))
                 }
             }
 
-            $list =  array_merge($list, $active_list, $passive_list);
+            $list = array_merge($list, $active_list, $passive_list);
         }
     }
     else
@@ -509,6 +509,7 @@ elseif (!isset($messageStatement))
     if ($gValidLogin && ($gPreferences['max_email_attachment_size'] > 0) && (ini_get('file_uploads') === '1'))
     {
         $form->addFileUpload('btn_add_attachment', $gL10n->get('MAI_ATTACHEMENT'), array('enableMultiUploads' => true,
+                                                                                         'maxUploadSize'      => Email::getMaxAttachementSize('b'),
                                                                                          'multiUploadLabel'   => $gL10n->get('MAI_ADD_ATTACHEMENT'),
                                                                                          'hideUploadField'    => true,
                                                                                          'helpTextIdLabel'    => array('MAI_MAX_ATTACHMENT_SIZE', Email::getMaxAttachementSize('mib'))));
@@ -534,7 +535,7 @@ elseif (!isset($messageStatement))
         $form->closeGroupBox();
     }
 
-    $form->addSubmitButton('btn_send', $gL10n->get('SYS_SEND'), array('icon' => THEME_PATH.'/icons/email.png'));
+    $form->addSubmitButton('btn_send', $gL10n->get('SYS_SEND'), array('icon' => THEME_URL.'/icons/email.png'));
 
     // add form to html page and show page
     $page->addHtml($form->show(false));
@@ -542,6 +543,8 @@ elseif (!isset($messageStatement))
 
 if (isset($messageStatement))
 {
+    require_once('messages_functions.php');
+
     $page->addHtml('<br />');
     while ($row = $messageStatement->fetch())
     {
@@ -565,38 +568,10 @@ if (isset($messageStatement))
         {
             $message = new TableMessage($gDb, $getMsgId);
             $receivers = $message->getValue('msg_usr_id_receiver');
-            // open some additonal functions for messages
-            $moduleMessages = new ModuleMessages();
-            $receiverName = '';
-            if (strpos($receivers, '|') > 0)
-            {
-                $receiverSplit = explode('|', $receivers);
-                foreach ($receiverSplit as $value)
-                {
-                    if (strpos($value, ':') > 0)
-                    {
-                        $receiverName .= '; ' . $moduleMessages->msgGroupNameSplit($value);
-                    }
-                    else
-                    {
-                        $user = new User($gDb, $gProfileFields, $value);
-                        $receiverName .= '; ' . $user->getValue('FIRST_NAME').' '.$user->getValue('LAST_NAME');
-                    }
-                }
-            }
-            else
-            {
-                if (strpos($receivers, ':') > 0)
-                {
-                    $receiverName .= '; ' . $moduleMessages->msgGroupNameSplit($receivers);
-                }
-                else
-                {
-                    $user = new User($gDb, $gProfileFields, $receivers);
-                    $receiverName .= '; ' . $user->getValue('FIRST_NAME').' '.$user->getValue('LAST_NAME');
-                }
-            }
-            $receiverName = '<div class="panel-footer">'.$gL10n->get('MSG_OPPOSITE').': '.substr($receiverName, 2).'</div>';
+            // open some additional functions for messages
+
+            $receiverName = prepareReceivers($receivers);
+            $receiverName = '<div class="panel-footer">'.$gL10n->get('MSG_OPPOSITE').': '.$receiverName.'</div>';
         }
 
         $date = DateTime::createFromFormat('Y-m-d H:i:s', $row['msc_timestamp']);
@@ -605,7 +580,7 @@ if (isset($messageStatement))
             <div class="panel-heading">
                 <div class="row">
                     <div class="col-sm-8">
-                        <img class="admidio-panel-heading-icon" src="'. THEME_PATH. '/icons/guestbook.png" alt="'.$sentUser.'" />' . $sentUser . '
+                        <img class="admidio-panel-heading-icon" src="'. THEME_URL. '/icons/guestbook.png" alt="'.$sentUser.'" />' . $sentUser . '
                     </div>
                     <div class="col-sm-4 text-right">' . $date->format($gPreferences['system_date'].' '.$gPreferences['system_time']) .
                     '</div>

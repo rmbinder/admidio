@@ -4,7 +4,7 @@
  * Import users from a csv file
  *
  * @copyright 2004-2016 The Admidio Team
- * @see http://www.admidio.org/
+ * @see https://www.admidio.org/
  * @license https://www.gnu.org/licenses/gpl-2.0.html GNU General Public License v2.0 only
  ***********************************************************************************************
  */
@@ -271,6 +271,6 @@ $_SESSION['user_import_mode'] = '';
 $_SESSION['file_lines']       = '';
 $_SESSION['value_separator']  = '';
 
-$gMessage->setForwardUrl($g_root_path.'/adm_program/modules/members/members.php');
+$gMessage->setForwardUrl(ADMIDIO_URL.'/adm_program/modules/members/members.php');
 $gMessage->show($gL10n->get('MEM_IMPORT_SUCCESSFUL', $countImportNewUser, $countImportEditUser, $countImportEditRole));
 // => EXIT

@@ -2,7 +2,7 @@
 /**
  ***********************************************************************************************
  * @copyright 2004-2016 The Admidio Team
- * @see http://www.admidio.org/
+ * @see https://www.admidio.org/
  * @license https://www.gnu.org/licenses/gpl-2.0.html GNU General Public License v2.0 only
  ***********************************************************************************************
  */
@@ -23,7 +23,7 @@
  * // create object and open connection to database
  * try
  * {
- *     $gDb = new Database($gDbType, $g_adm_srv, null, $g_adm_db, $g_adm_usr, $g_adm_pw);
+ *     $gDb = new Database($gDbType, $g_adm_srv, $g_adm_port, $g_adm_db, $g_adm_usr, $g_adm_pw);
  * }
  * catch (AdmException $e)
  * {
@@ -66,6 +66,7 @@ class Database
     protected $options;
 
     protected $dsn;
+    protected $dbEngine;
     protected $pdo;                 ///< The PDO object that handles the communication with the database.
     protected $transactions;        ///< The transaction marker. If this is > 0 than a transaction is open.
     protected $pdoStatement;        ///< The PdoStatement object which is needed to handle the return of a query.
@@ -88,6 +89,8 @@ class Database
      */
     public function __construct($engine, $host, $port = null, $dbName, $username = null, $password = null, array $options = array())
     {
+        global $gLogger;
+
         // for compatibility to old versions accept the string postgresql
         if ($engine === 'postgresql')
         {
@@ -117,7 +120,7 @@ class Database
             }
             if (!in_array($engine, $availableDrivers, true))
             {
-                throw new PDOException('The requested PDO driver '.$engine.' is not supported');
+                throw new PDOException('The requested PDO driver ' . $engine . ' is not supported');
             }
 
             $this->setDSNString($engine);
@@ -125,10 +128,23 @@ class Database
             // needed to avoid leaking username, password, ... if a PDOException is thrown
             $this->pdo = new PDO($this->dsn, $this->username, $this->password, $this->options);
 
+            $this->dbEngine = $this->pdo->getAttribute(PDO::ATTR_DRIVER_NAME);
+
             $this->setConnectionOptions();
         }
         catch (PDOException $e)
         {
+            $logContext = array(
+                'engine'   => $engine,
+                'host'     => $this->host,
+                'port'     => $this->port,
+                'dbName'   => $this->dbName,
+                'username' => $this->username,
+                'password' => '******',
+                'options'  => $this->options
+            );
+            $gLogger->alert('Could not connect to Database! EXCEPTION MSG: ' . $e->getMessage(), $logContext);
+
             throw new AdmException($e->getMessage());
         }
     }
@@ -144,25 +160,22 @@ class Database
         switch ($engine)
         {
             case 'mysql':
-                if ($this->port === null)
+
+                $port = '';
+                if ($this->port !== null)
                 {
-                    $this->dsn = 'mysql:host='.$this->host.';dbname='.$this->dbName;
+                    $port = ';port=' . $this->port;
                 }
-                else
-                {
-                    $this->dsn = 'mysql:host='.$this->host.';port='.$this->port.';dbname='.$this->dbName;
-                }
+                $this->dsn = 'mysql:host=' . $this->host . $port . ';dbname=' . $this->dbName . ';charset=utf8mb4';
                 break;
 
             case 'pgsql':
-                if ($this->port === null)
+                $port = '';
+                if ($this->port !== null)
                 {
-                    $this->dsn = 'pgsql:host='.$this->host.';dbname='.$this->dbName;
+                    $port = ';port=' . $this->port;
                 }
-                else
-                {
-                    $this->dsn = 'pgsql:host='.$this->host.';port='.$this->port.';dbname='.$this->dbName;
-                }
+                $this->dsn = 'pgsql:host=' . $this->host . $port . ';dbname=' . $this->dbName;
                 break;
 
             default:
@@ -180,7 +193,7 @@ class Database
 
         if ($gDebug)
         {
-            $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION); // maybe change to PDO::ERRMODE_WARNING
+            $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         }
         else
         {
@@ -192,15 +205,18 @@ class Database
         $this->pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_BOTH); // maybe change in future to PDO::FETCH_ASSOC or PDO::FETCH_OBJ
         $this->pdo->setAttribute(PDO::ATTR_CASE, PDO::CASE_NATURAL);
 
-        // Connect to database with UTF8
-        $this->query('SET NAMES \'UTF8\'');
-
-        if ($this->pdo->getAttribute(PDO::ATTR_DRIVER_NAME) === 'mysql')
+        switch ($this->dbEngine)
         {
-            // set ANSI mode, that SQL could be more compatible with other DBs
-            $this->query('SET SQL_MODE = \'ANSI\'');
-            // if the server has limited the joins, it can be canceled with this statement
-            $this->query('SET SQL_BIG_SELECTS = 1');
+            case 'mysql':
+                // MySQL charset UTF-8 is set in DSN-string
+                // set ANSI mode, that SQL could be more compatible with other DBs
+                $this->query('SET SQL_MODE = \'ANSI\'');
+                // if the server has limited the joins, it can be canceled with this statement
+                $this->query('SET SQL_BIG_SELECTS = 1');
+                break;
+            case 'pgsql':
+                $this->query('SET NAMES UNICODE');
+                break;
         }
     }
 
@@ -210,8 +226,8 @@ class Database
      */
     protected function getPropertyFromDatabaseConfig($property)
     {
-        $xmlDatabases = new SimpleXMLElement(SERVER_PATH.'/adm_program/system/databases.xml', null, true);
-        $node = $xmlDatabases->xpath('/databases/database[@id="'.$this->pdo->getAttribute(PDO::ATTR_DRIVER_NAME).'"]/'.$property);
+        $xmlDatabases = new SimpleXMLElement(ADMIDIO_PATH . '/adm_program/system/databases.xml', null, true);
+        $node = $xmlDatabases->xpath('/databases/database[@id="' . $this->dbEngine . '"]/' . $property);
         return (string) $node[0];
     }
 
@@ -250,7 +266,7 @@ class Database
         $versionStatement = $this->query('SELECT version()');
         $version = $versionStatement->fetchColumn();
 
-        if ($this->pdo->getAttribute(PDO::ATTR_DRIVER_NAME) === 'pgsql')
+        if ($this->dbEngine === 'pgsql')
         {
             // the string (PostgreSQL 9.0.4, compiled by Visual C++ build 1500, 64-bit) must be separated
             $versionArray  = explode(',', $version);
@@ -270,7 +286,7 @@ class Database
      */
     public function startTransaction()
     {
-        global $gDebug;
+        global $gLogger;
 
         // If we are within a transaction we will not open another one,
         // but enclose the current one to not loose data (prevening auto commit)
@@ -281,10 +297,7 @@ class Database
         }
 
         // if debug mode then log all sql statements
-        if ($gDebug)
-        {
-            error_log('START TRANSACTION');
-        }
+        $gLogger->info('START TRANSACTION');
 
         $result = $this->pdo->beginTransaction();
 
@@ -308,7 +321,7 @@ class Database
      */
     public function endTransaction()
     {
-        global $gDebug;
+        global $gLogger;
 
         // if there is no open transaction then do nothing and return
         if ($this->transactions === 0)
@@ -325,10 +338,7 @@ class Database
         }
 
         // if debug mode then log all sql statements
-        if ($gDebug)
-        {
-            error_log('COMMIT');
-        }
+        $gLogger->info('COMMIT');
 
         $result = $this->pdo->commit();
 
@@ -380,7 +390,7 @@ class Database
             }
             else
             {
-                $trace['file'] = str_replace(array(SERVER_PATH, '\\'), array('', '/'), $trace['file']);
+                $trace['file'] = str_replace(array(ADMIDIO_PATH, '\\'), array('', '/'), $trace['file']);
                 $trace['file'] = substr($trace['file'], 1);
             }
             $args = array();
@@ -396,9 +406,9 @@ class Database
                 if (!empty($trace['args'][0]))
                 {
                     $argument = htmlentities($trace['args'][0]);
-                    $argument = str_replace(array(SERVER_PATH, '\\'), array('', '/'), $argument);
+                    $argument = str_replace(array(ADMIDIO_PATH, '\\'), array('', '/'), $argument);
                     $argument = substr($argument, 1);
-                    $args[] = "'{$argument}'";
+                    $args[] = '\'' . $argument . '\'';
                 }
             }
 
@@ -406,11 +416,11 @@ class Database
             $trace['type']  = array_key_exists('type',  $trace) ? $trace['type'] : '';
 
             $output .= '<br />';
-            $output .= '<strong>FILE:</strong> '.htmlentities($trace['file']).'<br />';
-            $output .= '<strong>LINE:</strong> '.((!empty($trace['line'])) ? $trace['line'] : '').'<br />';
+            $output .= '<strong>FILE:</strong> ' . htmlentities($trace['file']) . '<br />';
+            $output .= '<strong>LINE:</strong> ' . ((!empty($trace['line'])) ? $trace['line'] : '') . '<br />';
 
-            $output .= '<strong>CALL:</strong> '.htmlentities($trace['class'].$trace['type'].$trace['function']).
-                       '('.(count($args) ? implode(', ', $args) : '').')<br />';
+            $output .= '<strong>CALL:</strong> ' . htmlentities($trace['class'] . $trace['type'] . $trace['function']) .
+                       '(' . (count($args) ? implode(', ', $args) : '') . ')<br />';
         }
         $output .= '</div>';
 
@@ -425,7 +435,7 @@ class Database
      */
     public function lastInsertId()
     {
-        if ($this->pdo->getAttribute(PDO::ATTR_DRIVER_NAME) === 'pgsql')
+        if ($this->dbEngine === 'pgsql')
         {
             $lastValStatement = $this->query('SELECT lastval()');
             return $lastValStatement->fetchColumn();
@@ -448,21 +458,20 @@ class Database
      */
     public function query($sql, $showError = true)
     {
-        global $gDebug;
+        global $gLogger;
 
-        if ($this->pdo->getAttribute(PDO::ATTR_DRIVER_NAME) === 'pgsql')
+        if ($this->dbEngine === 'pgsql')
         {
             $sqlCompare = strtolower($sql);
 
             // prepare the sql statement to be compatible with PostgreSQL
+            if (strpos($sqlCompare, 'create table') !== false)
+            {
+                // on a create-table-statement if necessary cut existing MySQL table options
+                $sql = substr($sql, 0, strrpos($sql, ')') + 1);
+            }
             if (strpos($sqlCompare, 'create table') !== false || strpos($sqlCompare, 'alter table') !== false)
             {
-                if (strpos($sqlCompare, 'create table') !== false)
-                {
-                    // on a create-table-statement if necessary cut existing MySQL table options
-                    $sql = substr($sql, 0, strrpos($sql, ')') + 1);
-                }
-
                 $replaceArray = array(
                     // PostgreSQL doesn't know unsigned
                     'unsigned' => '',
@@ -478,20 +487,17 @@ class Database
                 if ($posAutoIncrement > 0)
                 {
                     $posInteger = strrpos(substr($sql, 0, $posAutoIncrement), 'integer');
-                    $sql = substr($sql, 0, $posInteger).' serial '.substr($sql, $posAutoIncrement + 14);
+                    $sql = substr($sql, 0, $posInteger) . ' serial ' . substr($sql, $posAutoIncrement + 14);
                 }
             }
         }
 
         // if debug mode then log all sql statements
-        if ($gDebug)
-        {
-            error_log($sql);
-        }
+        $gLogger->info($sql);
 
         try
         {
-            $this->fetchArray   = array();
+            $this->fetchArray = array();
             $this->pdoStatement = $this->pdo->query($sql);
         }
         catch (PDOException $e)
@@ -503,10 +509,9 @@ class Database
             }
         }
 
-        if ($gDebug && strpos(strtoupper($sql), 'SELECT') === 0)
+        if (strpos(strtoupper($sql), 'SELECT') === 0)
         {
-            // if debug modus then show number of selected rows
-            error_log('Found rows: '.$this->pdoStatement->rowCount());
+            $gLogger->info('Found rows: '.$this->pdoStatement->rowCount());
         }
 
         return $this->pdoStatement;
@@ -521,157 +526,161 @@ class Database
      */
     public function rollback()
     {
-        global $gDebug;
+        global $gLogger;
 
-        if ($this->transactions > 0)
+        if ($this->transactions === 0)
         {
-            // if debug mode then log all sql statements
-            if ($gDebug)
-            {
-                error_log('ROLLBACK');
-            }
-
-            $result = $this->pdo->rollBack();
-
-            if (!$result)
-            {
-                $this->showError();
-                // => EXIT
-            }
-
-            $this->transactions = 0;
-            return true;
+            return false;
         }
-        return false;
+
+        // if debug mode then log all sql statements
+        $gLogger->info('ROLLBACK');
+
+        $result = $this->pdo->rollBack();
+
+        if (!$result)
+        {
+            $this->showError();
+            // => EXIT
+        }
+
+        $this->transactions = 0;
+
+        return true;
     }
 
     /**
-     * Methods reads all columns and their properties from the database table.
-     * @param string $table                Name of the database table for which the columns should be shown.
-     * @param bool   $showColumnProperties If this is set to @b false only the column names were returned.
-     * @return string[]|array[] Returns an array with each column and their properties if $showColumnProperties is set to @b true.
-     *               The array has the following format:
-     *               array (
-     *                   'column1' => array (
-     *                       'serial' => '1',
-     *                       'null'   => '0',
-     *                       'key'    => '0',
-     *                       'type'   => 'integer'
-     *                    ),
-     *                   'column2' => array (...)
-     *               ...
-     *               )
+     * Method gets all columns and their properties from the database table.
+     *
+     * The array has the following format:
+     * array (
+     *     'columnName1' => array (
+     *         'serial'   => true,
+     *         'null'     => false,
+     *         'key'      => false,
+     *         'unsigned' => true,
+     *         'default'  => 10
+     *         'type'     => 'integer'
+     *     ),
+     *     'columnName2' => array (...),
+     *     ...
+     * )
+     *
+     * @param string $table Name of the database table for which the columns-properties should be loaded.
+     *
+     * TODO: Links for improvements
+     *       https://secure.php.net/manual/en/pdostatement.getcolumnmeta.php
+     *       https://www.postgresql.org/docs/9.5/static/infoschema-columns.html
+     *       https://wiki.postgresql.org/wiki/Retrieve_primary_key_columns
+     *       https://dev.mysql.com/doc/refman/5.7/en/columns-table.html
      */
-    public function showColumns($table, $showColumnProperties = true)
+    private function loadTableColumnsProperties($table)
+    {
+        $tableColumnsProperties = array();
+
+        if ($this->dbEngine === 'mysql')
+        {
+            $sql = 'SHOW COLUMNS FROM ' . $table;
+            $columnsStatement = $this->query($sql);
+            $columnsList      = $columnsStatement->fetchAll();
+
+            foreach ($columnsList as $properties)
+            {
+                $props = array(
+                    'serial'   => $properties['Extra'] === 'auto_increment',
+                    'null'     => $properties['Null'] === 'YES',
+                    'key'      => $properties['Key'] === 'PRI' || $properties['Key'] === 'MUL',
+                    'default'  => $properties['Default'],
+                    'unsigned' => strpos($properties['Type'], 'unsigned' !== false)
+                );
+
+                if (strpos($properties['Type'], 'tinyint(1)') !== false)
+                {
+                    $props['type'] = 'boolean';
+                }
+                elseif (strpos($properties['Type'], 'smallint') !== false)
+                {
+                    $props['type'] = 'smallint';
+                }
+                elseif (strpos($properties['Type'], 'int') !== false)
+                {
+                    $props['type'] = 'integer';
+                }
+                else
+                {
+                    $props['type'] = $properties['Type'];
+                }
+
+                $tableColumnsProperties[$properties['Field']] = $props;
+            }
+        }
+        elseif ($this->dbEngine === 'pgsql')
+        {
+            $sql = 'SELECT column_name, column_default, is_nullable, data_type
+                      FROM information_schema.columns
+                     WHERE table_name = \'' . $table . '\'';
+            $columnsStatement = $this->query($sql);
+            $columnsList = $columnsStatement->fetchAll();
+
+            foreach ($columnsList as $properties)
+            {
+                $props = array(
+                    'serial'   => strpos($properties['column_default'], 'nextval') !== false,
+                    'null'     => $properties['is_nullable'] === 'YES',
+                    'key'      => null,
+                    'default'  => $properties['Default'],
+                    'unsigned' => null
+                );
+
+                if (strpos($properties['data_type'], 'timestamp') !== false)
+                {
+                    $props['type'] = 'timestamp';
+                }
+                elseif (strpos($properties['data_type'], 'time') !== false)
+                {
+                    $props['type'] = 'time';
+                }
+                else
+                {
+                    $props['type'] = $properties['data_type'];
+                }
+
+                $tableColumnsProperties[$properties['column_name']] = $props;
+            }
+        }
+
+        // safe array with table structure in class array
+        $this->dbStructure[$table] = $tableColumnsProperties;
+    }
+
+    /**
+     * Method get all columns and their properties from the database table.
+     * @param string $table Name of the database table for which the columns-properties should be shown.
+     * @return array[] Returns an array with column-names.
+     */
+    public function getTableColumnsProperties($table)
     {
         if (!array_key_exists($table, $this->dbStructure))
         {
-            $columnProperties = array();
-
-            if ($this->pdo->getAttribute(PDO::ATTR_DRIVER_NAME) === 'mysql')
-            {
-                $sql = 'SHOW COLUMNS FROM '.$table;
-                $columnsStatement = $this->query($sql);
-                $columnsList      = $columnsStatement->fetchAll();
-
-                foreach ($columnsList as $properties)
-                {
-                    $columnProperties[$properties['Field']]['serial'] = 0;
-                    $columnProperties[$properties['Field']]['null']   = 0;
-                    $columnProperties[$properties['Field']]['key']    = 0;
-
-                    if ($properties['Extra'] === 'auto_increment')
-                    {
-                        $columnProperties[$properties['Field']]['serial'] = 1;
-                    }
-                    if ($properties['Null'] === 'YES')
-                    {
-                        $columnProperties[$properties['Field']]['null'] = 1;
-                    }
-                    if ($properties['Key'] === 'PRI' || $properties['Key'] === 'MUL')
-                    {
-                        $columnProperties[$properties['Field']]['key'] = 1;
-                    }
-
-                    if (strpos($properties['Type'], 'tinyint(1)') !== false)
-                    {
-                        $columnProperties[$properties['Field']]['type'] = 'boolean';
-                    }
-                    elseif (strpos($properties['Type'], 'smallint') !== false)
-                    {
-                        $columnProperties[$properties['Field']]['type'] = 'smallint';
-                    }
-                    elseif (strpos($properties['Type'], 'int') !== false)
-                    {
-                        $columnProperties[$properties['Field']]['type'] = 'integer';
-                    }
-                    else
-                    {
-                        $columnProperties[$properties['Field']]['type'] = $properties['Type'];
-                    }
-                }
-            }
-            elseif ($this->pdo->getAttribute(PDO::ATTR_DRIVER_NAME) === 'pgsql')
-            {
-                $sql = 'SELECT column_name, column_default, is_nullable, data_type
-                          FROM information_schema.columns
-                         WHERE table_name = \''.$table.'\'';
-                $columnsStatement = $this->query($sql);
-                $columnsList = $columnsStatement->fetchAll();
-
-                foreach ($columnsList as $properties)
-                {
-                    $columnProperties[$properties['column_name']]['serial'] = 0;
-                    $columnProperties[$properties['column_name']]['null']   = 0;
-                    $columnProperties[$properties['column_name']]['key']    = 0;
-
-                    if (strpos($properties['column_default'], 'nextval') !== false)
-                    {
-                        $columnProperties[$properties['column_name']]['serial'] = 1;
-                    }
-                    if ($properties['is_nullable'] === 'YES')
-                    {
-                        $columnProperties[$properties['column_name']]['null'] = 1;
-                    }
-                    /*if ($properties['Key'] === 'PRI' || $properties['Key'] === 'MUL')
-                    {
-                        $columnProperties[$properties['column_name']]['key'] = 1;
-                    }*/
-
-                    if (strpos($properties['data_type'], 'timestamp') !== false)
-                    {
-                        $columnProperties[$properties['column_name']]['type'] = 'timestamp';
-                    }
-                    elseif (strpos($properties['data_type'], 'time') !== false)
-                    {
-                        $columnProperties[$properties['column_name']]['type'] = 'time';
-                    }
-                    else
-                    {
-                        $columnProperties[$properties['column_name']]['type'] = $properties['data_type'];
-                    }
-                }
-            }
-
-            // safe array with table structure in class array
-            $this->dbStructure[$table] = $columnProperties;
+            $this->loadTableColumnsProperties($table);
         }
 
-        if ($showColumnProperties)
+        return $this->dbStructure[$table];
+    }
+
+    /**
+     * Method get all columns-names from the database table.
+     * @param string $table Name of the database table for which the columns should be shown.
+     * @return string[] Returns an array with each column and their properties.
+     */
+    public function getTableColumns($table)
+    {
+        if (!array_key_exists($table, $this->dbStructure))
         {
-            // returns all columns with their properties of the table
-            return $this->dbStructure[$table];
+            $this->loadTableColumnsProperties($table);
         }
 
-        // returns only the column names of the table.
-        $tableColumns = array();
-
-        foreach ($this->dbStructure[$table] as $columnName => $columnProperties)
-        {
-            $tableColumns[] = $columnName;
-        }
-
-        return $tableColumns;
+        return array_keys($this->dbStructure[$table]);
     }
 
     /**
@@ -682,7 +691,7 @@ class Database
      */
     public function showError()
     {
-        global $g_root_path, $gMessage, $gPreferences, $gCurrentOrganization, $gDebug, $gL10n;
+        global $gLogger, $gPreferences, $gL10n;
 
         $backtrace = $this->getBacktrace();
 
@@ -696,24 +705,20 @@ class Database
         $errorCode = $this->pdo->errorCode();
         $errorInfo = $this->pdo->errorInfo();
 
+        $gLogger->critical($errorCode.': '.$errorInfo[1]."\n".$errorInfo[2]);
+
         $htmlOutput = '
             <div style="font-family: monospace;">
                  <p><strong>S Q L - E R R O R</strong></p>
-                 <p><strong>CODE:</strong> '.$errorCode.'</p>
-                 '.$errorInfo[1].'<br /><br />
-                 '.$errorInfo[2].'<br /><br />
+                 <p><strong>CODE:</strong> ' . $errorCode . '</p>
+                 ' . $errorInfo[1] . '<br /><br />
+                 ' . $errorInfo[2] . '<br /><br />
                  <strong>B A C K T R A C E</strong><br />
-                 '.$backtrace.'
+                 ' . $backtrace . '
              </div>';
 
-        // in debug mode show error in log file
-        if ($gDebug)
-        {
-            error_log($errorCode.': '.$errorInfo[1]."\n".$errorInfo[2]);
-        }
-
         // display database error to user
-        if (isset($gPreferences) && defined('THEME_SERVER_PATH') && !headers_sent())
+        if (isset($gPreferences) && defined('THEME_ADMIDIO_PATH') && !headers_sent())
         {
             // create html page object
             $page = new HtmlPage($gL10n->get('SYS_DATABASE_ERROR'));
@@ -736,6 +741,10 @@ class Database
      */
     public static function getAvailableDBs()
     {
+        global $gLogger;
+
+        $gLogger->warning('DEPRECATED: "$database->getAvailableDBs()" is deprecated, use "PDO::getAvailableDrivers()" instead!');
+
         return PDO::getAvailableDrivers();
     }
 
@@ -753,6 +762,10 @@ class Database
      */
     public function fetch_array(PDOStatement $pdoStatement = null, $fetchType = PDO::FETCH_BOTH)
     {
+        global $gLogger;
+
+        $gLogger->warning('DEPRECATED: "$database->fetch_array()" is deprecated, use "$this->pdoStatement->fetch()" instead!');
+
         // if pdo statement is committed then fetch this object
         if ($pdoStatement instanceof \PDOStatement)
         {
@@ -780,6 +793,10 @@ class Database
      */
     public function fetch_object(PDOStatement $pdoStatement = null)
     {
+        global $gLogger;
+
+        $gLogger->warning('DEPRECATED: "$database->fetch_object()" is deprecated, use "$this->pdoStatement->fetchObject()" instead!');
+
         // if pdo statement is committed then fetch this object
         if ($pdoStatement instanceof \PDOStatement)
         {
@@ -803,6 +820,10 @@ class Database
      */
     public function insert_id()
     {
+        global $gLogger;
+
+        $gLogger->warning('DEPRECATED: "$database->insert_id()" is deprecated, use "$database->lastInsertId()" instead!');
+
         return $this->lastInsertId();
     }
 
@@ -818,6 +839,10 @@ class Database
      */
     public function num_rows(PDOStatement $pdoStatement = null)
     {
+        global $gLogger;
+
+        $gLogger->warning('DEPRECATED: "$database->num_rows()" is deprecated, use "$this->pdoStatement->rowCount()" instead!');
+
         // if pdo statement is committed then fetch this object
         if ($pdoStatement instanceof \PDOStatement)
         {
@@ -830,5 +855,28 @@ class Database
         }
 
         return null;
+    }
+
+    /**
+     * Method gets all columns and their properties from the database table.
+     * @deprecated 3.2.0:4.0.0 Switch to new methods (getTableColumnsProperties(), getTableColumns()).
+     * @param string $table                Name of the database table for which the columns should be shown.
+     * @param bool   $showColumnProperties If this is set to @b false only the column names were returned.
+     * @return string[]|array[] Returns an array with each column and their properties if $showColumnProperties is set to @b true.
+     */
+    public function showColumns($table, $showColumnProperties = true)
+    {
+        global $gLogger;
+
+        $gLogger->warning('DEPRECATED: "$database->showColumns()" is deprecated, use "$database->getTableColumnsProperties()" or "$database->getTableColumns()" instead!');
+
+        if ($showColumnProperties)
+        {
+            // returns all columns with their properties of the table
+            return $this->getTableColumnsProperties($table);
+        }
+
+        // returns only the column names of the table.
+        return $this->getTableColumns($table);
     }
 }

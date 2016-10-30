@@ -2,17 +2,17 @@
 /**
  ***********************************************************************************************
  * @copyright 2004-2016 The Admidio Team
- * @see http://www.admidio.org/
+ * @see https://www.admidio.org/
  * @license https://www.gnu.org/licenses/gpl-2.0.html GNU General Public License v2.0 only
  ***********************************************************************************************
  */
 
 // provide forward compatibility with the password_* functions that ship with PHP 5.5
-require_once(SERVER_PATH.'/adm_program/libs/password_compat/password.php');
+require_once(ADMIDIO_PATH.'/adm_program/libs/password_compat/password.php');
 // provide forward compatibility with the random_* functions that ship with PHP 7.0
-require_once(SERVER_PATH.'/adm_program/libs/random_compat/lib/random.php');
+require_once(ADMIDIO_PATH.'/adm_program/libs/random_compat/lib/random.php');
 // old phpass password hashing lib for backward compatibility
-require_once(SERVER_PATH.'/adm_program/libs/phpass/passwordhash.php');
+require_once(ADMIDIO_PATH.'/adm_program/libs/phpass/passwordhash.php');
 
 /**
  * @class PasswordHashing

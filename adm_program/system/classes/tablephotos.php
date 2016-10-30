@@ -4,7 +4,7 @@
  * Class manages access to database table adm_photos
  *
  * @copyright 2004-2016 The Admidio Team
- * @see http://www.admidio.org/
+ * @see https://www.admidio.org/
  * @license https://www.gnu.org/licenses/gpl-2.0.html GNU General Public License v2.0 only
  ***********************************************************************************************
  */
@@ -148,7 +148,7 @@ class TablePhotos extends TableAccess
         if ($returnValue)
         {
             // Ordnerpfad zusammensetzen
-            $folder = SERVER_PATH.'/adm_my_files/photos/'.$this->getValue('pho_begin', 'Y-m-d').'_'.$photoId;
+            $folder = ADMIDIO_PATH.'/adm_my_files/photos/'.$this->getValue('pho_begin', 'Y-m-d').'_'.$photoId;
 
             // aktuellen Ordner incl. Unterordner und Dateien loeschen, falls er existiert
             if (is_dir($folder))

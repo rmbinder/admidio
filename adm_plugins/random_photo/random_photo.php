@@ -11,7 +11,7 @@
  * Compatible with Admidio version 3.1
  *
  * @copyright 2004-2016 The Admidio Team
- * @see http://www.admidio.org/
+ * @see https://www.admidio.org/
  * @license https://www.gnu.org/licenses/gpl-2.0.html GNU General Public License v2.0 only
  ***********************************************************************************************
  */
@@ -129,7 +129,7 @@ while(!is_file($picPath) && $i < 20 && $albumStatement->rowCount() > 0)
 
 if(!is_file($picPath))
 {
-    $picPath = THEME_SERVER_PATH. '/images/nopix.jpg';
+    $picPath = THEME_ADMIDIO_PATH. '/images/nopix.jpg';
 }
 
 // Ermittlung der Original Bildgroesse
@@ -164,14 +164,14 @@ else
 
 // Ausgabe
 $pho_id = $album->getValue('pho_id');
-echo '<a class="'.$plg_link_class.'" href="'. $g_root_path. '/adm_program/modules/photos/photos.php?pho_id='.$pho_id.'&amp;photo_nr='.$picNr.'" target="'. $plg_link_target. '"><img
+echo '<a class="'.$plg_link_class.'" href="'. ADMIDIO_URL. '/adm_program/modules/photos/photos.php?pho_id='.$pho_id.'&amp;photo_nr='.$picNr.'" target="'. $plg_link_target. '"><img
     class="thumbnail" alt="'.$linkText.'" title="'.$linkText.'"
-    src="'.$g_root_path.'/adm_program/modules/photos/photo_show.php?pho_id='.$pho_id.'&amp;photo_nr='.$picNr.'&amp;pho_begin='.$album->getValue('pho_begin', 'Y-m-d').'&amp;max_width='.$plg_photos_max_width.'&amp;max_height='.$plg_photos_max_height.'" /></a>';
+    src="'.ADMIDIO_URL.'/adm_program/modules/photos/photo_show.php?pho_id='.$pho_id.'&amp;photo_nr='.$picNr.'&amp;pho_begin='.$album->getValue('pho_begin', 'Y-m-d').'&amp;max_width='.$plg_photos_max_width.'&amp;max_height='.$plg_photos_max_height.'" /></a>';
 
 // Link zum Album
 if($plg_photos_show_link)
 {
-    echo '<a class="'.$plg_link_class.'" href="'.$g_root_path.'/adm_program/modules/photos/photos.php?pho_id='.$pho_id.'" target="'.$plg_link_target.'">'.$linkText.'</a>';
+    echo '<a class="'.$plg_link_class.'" href="'.ADMIDIO_URL.'/adm_program/modules/photos/photos.php?pho_id='.$pho_id.'" target="'.$plg_link_target.'">'.$linkText.'</a>';
 }
 
 echo '</div>';

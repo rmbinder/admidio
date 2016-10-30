@@ -2,7 +2,7 @@
 /**
  ***********************************************************************************************
  * @copyright 2004-2016 The Admidio Team
- * @see http://www.admidio.org/
+ * @see https://www.admidio.org/
  * @license https://www.gnu.org/licenses/gpl-2.0.html GNU General Public License v2.0 only
  ***********************************************************************************************
  */
@@ -64,7 +64,7 @@ class HtmlList extends HtmlElement
      */
     public function __construct($list = 'ul', $id = null, $class = null)
     {
-        parent::__construct($list, '', '', true);
+        parent::__construct($list);
 
         if ($id !== null)
         {

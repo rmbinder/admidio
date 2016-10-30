@@ -4,7 +4,7 @@
  * Klasse erweitert das PHP-DateTime-Objekt um einige nuetzliche Funktionen
  *
  * @copyright 2004-2016 The Admidio Team
- * @see http://www.admidio.org/
+ * @see https://www.admidio.org/
  * @license https://www.gnu.org/licenses/gpl-2.0.html GNU General Public License v2.0 only
  ***********************************************************************************************
  */
@@ -25,6 +25,10 @@ class DateTimeExtended extends DateTime
      */
     public function __construct($date, $format, DateTimeZone $timezone = null)
     {
+        global $gLogger;
+
+        $gLogger->warning('DEPRECATED: "new DateTimeExtended()" is deprecated, use "DateTime::createFromFormat()" instead!');
+
         $datetime = DateTime::createFromFormat($format, $date);
 
         if ($datetime === false)
@@ -46,6 +50,10 @@ class DateTimeExtended extends DateTime
      */
     public function isValid()
     {
+        global $gLogger;
+
+        $gLogger->warning('DEPRECATED: "$dateTimeExtended->isValid()" is deprecated, use "DateTime::createFromFormat() === false" instead!');
+
         return $this->valid;
     }
 
@@ -57,6 +65,10 @@ class DateTimeExtended extends DateTime
      */
     public function getAge()
     {
+        global $gLogger;
+
+        $gLogger->warning('DEPRECATED: "$dateTimeExtended->getAge()" is deprecated, use "DateTime::createFromFormat()->diff(new DateTime(\'now\'))->y" instead!');
+
         return $this->diff(new DateTime('now'))->y;
     }
 
@@ -103,7 +115,7 @@ class DateTimeExtended extends DateTime
 
         foreach ($formatArray as $formatChar)
         {
-            switch($formatChar)
+            switch ($formatChar)
             {
                 case 'd':
                     $destFormat .= 'dd';

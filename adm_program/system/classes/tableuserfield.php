@@ -4,7 +4,7 @@
  * Class manages access to database table adm_user_fields
  *
  * @copyright 2004-2016 The Admidio Team
- * @see http://www.admidio.org/
+ * @see https://www.admidio.org/
  * @license https://www.gnu.org/licenses/gpl-2.0.html GNU General Public License v2.0 only
  ***********************************************************************************************
  */
@@ -230,7 +230,7 @@ class TableUserField extends TableAccess
                                             {
                                                 if (admStrIsValidFileName($listValueImage, true))
                                                 {
-                                                    $listValueImage = THEME_PATH . '/icons/' . $listValueImage;
+                                                    $listValueImage = THEME_URL . '/icons/' . $listValueImage;
                                                 }
                                             }
 
@@ -269,7 +269,7 @@ class TableUserField extends TableAccess
                             {
                                 if (admStrIsValidFileName($value, true))
                                 {
-                                    $value = THEME_PATH . '/icons/' . $value;
+                                    $value = THEME_URL . '/icons/' . $value;
                                 }
                             }
 

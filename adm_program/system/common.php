@@ -5,7 +5,7 @@
  * variables to run a script in the Admidio environment
  *
  * @copyright 2004-2016 The Admidio Team
- * @see http://www.admidio.org/
+ * @see https://www.admidio.org/
  * @license https://www.gnu.org/licenses/gpl-2.0.html GNU General Public License v2.0 only
  ***********************************************************************************************
  */
@@ -16,13 +16,13 @@ if (basename($_SERVER['SCRIPT_FILENAME']) === 'common.php')
 
 // embed config and constants file
 require_once(substr(__FILE__, 0, strpos(__FILE__, 'adm_program') - 1) . '/adm_my_files/config.php');
+require_once(substr(__FILE__, 0, strpos(__FILE__, 'adm_program') - 1) . '/adm_program/system/init_globals.php');
 require_once(substr(__FILE__, 0, strpos(__FILE__, 'adm_program') - 1) . '/adm_program/system/constants.php');
 
-// if there is no debug flag in config.php than set debug to false
-if(!isset($gDebug) || !$gDebug)
-{
-    $gDebug = 0;
-}
+// includes WITHOUT database connections
+require_once(ADMIDIO_PATH . '/adm_program/libs/htmlawed/htmlawed.php');
+require_once(ADMIDIO_PATH . '/adm_program/system/function.php');
+require_once(ADMIDIO_PATH . '/adm_program/system/string.php');
 
 if($gDebug)
 {
@@ -30,23 +30,10 @@ if($gDebug)
     error_reporting(E_ALL | E_STRICT); // PHP 5.3 fallback (https://secure.php.net/manual/en/function.error-reporting.php)
     ini_set('display_errors', '1');
     ini_set('display_startup_errors', '1');
-
-    // write actual script with parameters in log file
-    error_log('--------------------------------------------------------------------------------'."\n" .
-              $_SERVER['SCRIPT_FILENAME'] . "\n? " . $_SERVER['QUERY_STRING']);
-    error_log('memory_used::' . memory_get_usage());
 }
 
-// default prefix is set to 'adm' because of compatibility to old versions
-if($g_tbl_praefix === '')
-{
-    $g_tbl_praefix = 'adm';
-}
-
-// includes WITHOUT database connections
-require_once(SERVER_PATH . '/adm_program/libs/htmlawed/htmlawed.php');
-require_once(SERVER_PATH . '/adm_program/system/function.php');
-require_once(SERVER_PATH . '/adm_program/system/string.php');
+// LOGGING
+require_once(SERVER_PATH . '/adm_program/system/logging.php');
 
 // remove HTML & PHP-Code from all parameters
 $_GET    = admStrStripTagsSpecial($_GET);
@@ -57,6 +44,7 @@ $_COOKIE = admStrStripTagsSpecial($_COOKIE);
 // deprecated
 if(!get_magic_quotes_gpc())
 {
+    $gLogger->warning('DEPRECATED: Magic-Quotes should not be used!');
     $_GET    = strAddSlashesDeep($_GET);
     $_POST   = strAddSlashesDeep($_POST);
     $_COOKIE = strAddSlashesDeep($_COOKIE);
@@ -65,21 +53,9 @@ if(!get_magic_quotes_gpc())
 // global parameters
 $gValidLogin = false;
 
-// set default password-hash algorithm
-if (!isset($gPasswordHashAlgorithm))
-{
-    $gPasswordHashAlgorithm = 'DEFAULT';
-}
-
-// create database object and establish connection to database
-if(!isset($gDbType))
-{
-    $gDbType = 'mysql';
-}
-
 try
 {
-    $gDb = new Database($gDbType, $g_adm_srv, null, $g_adm_db, $g_adm_usr, $g_adm_pw);
+    $gDb = new Database($gDbType, $g_adm_srv, $g_adm_port, $g_adm_db, $g_adm_usr, $g_adm_pw);
 }
 catch(AdmException $e)
 {
@@ -89,7 +65,7 @@ catch(AdmException $e)
 
 // create an installation unique cookie prefix and remove special characters
 $gCookiePraefix = 'ADMIDIO_' . $g_organization . '_' . $g_adm_db . '_' . $g_tbl_praefix;
-$gCookiePraefix = strtr($gCookiePraefix, ' .,;:[]', '_______');
+$gCookiePraefix = str_replace(array(' ', '.', ',', ';', ':', '[', ']'), '_', $gCookiePraefix);
 
 /*********************************************************************************
  Create and validate sessions, check auto login, read session variables
@@ -154,6 +130,8 @@ else
 
     if($gCurrentOrganization->getValue('org_id') === 0)
     {
+        $gLogger->error('Organization could not be found!', array('$g_organization' => $g_organization));
+
         // organization not found
         exit('<div style="color: #cc0000;">Error: The organization of the config.php could not be found in the database!</div>');
     }
@@ -239,8 +217,11 @@ if(!array_key_exists('theme', $gPreferences))
 {
     $gPreferences['theme'] = 'modern';
 }
-define('THEME_SERVER_PATH', SERVER_PATH . '/adm_themes/' . $gPreferences['theme']);
-define('THEME_PATH', $g_root_path . '/adm_themes/' . $gPreferences['theme']);
+
+define('THEME_ADMIDIO_PATH', ADMIDIO_PATH . '/adm_themes/' . $gPreferences['theme']); // Will get "THEME_PATH" in v4.0
+define('THEME_URL', ADMIDIO_URL . '/adm_themes/' . $gPreferences['theme']);
+define('THEME_SERVER_PATH', THEME_ADMIDIO_PATH); // Deprecated
+define('THEME_PATH', THEME_URL); // Deprecated
 
 // Create message object which can be called if a message should be shown
 $gMessage = new Message();
@@ -270,9 +251,9 @@ catch(AdmException $e)
 // set default homepage
 if($gValidLogin)
 {
-    $gHomepage = $g_root_path . '/' . $gPreferences['homepage_login'];
+    $gHomepage = ADMIDIO_URL . '/' . $gPreferences['homepage_login'];
 }
 else
 {
-    $gHomepage = $g_root_path . '/' . $gPreferences['homepage_logout'];
+    $gHomepage = ADMIDIO_URL . '/' . $gPreferences['homepage_logout'];
 }

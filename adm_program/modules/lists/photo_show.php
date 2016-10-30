@@ -4,7 +4,7 @@
  * Show user photo
  *
  * @copyright 2004-2016 The Admidio Team
- * @see http://www.admidio.org/
+ * @see https://www.admidio.org/
  * @license https://www.gnu.org/licenses/gpl-2.0.html GNU General Public License v2.0 only
  *
  * Parameters:
@@ -24,7 +24,7 @@ $userPhoto = $user->getValue('usr_photo');
 if(strlen($userPhoto) === 0 || !$gCurrentUser->hasRightViewProfile($user))
 {
     header('Content-Type: image/png');
-    echo readfile(THEME_SERVER_PATH. '/images/no_profile_pic.png');
+    echo readfile(THEME_ADMIDIO_PATH. '/images/no_profile_pic.png');
 }
 else
 {

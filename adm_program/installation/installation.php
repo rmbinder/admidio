@@ -4,7 +4,7 @@
  * Installation and configuration of Admidio database and config file
  *
  * @copyright 2004-2016 The Admidio Team
- * @see http://www.admidio.org/
+ * @see https://www.admidio.org/
  * @license https://www.gnu.org/licenses/gpl-2.0.html GNU General Public License v2.0 only
  *
  * Parameters:
@@ -50,57 +50,47 @@ if(!isset($g_tbl_praefix))
     }
 }
 
-// embed constants file
-require_once(substr(__FILE__, 0, strpos(__FILE__, 'adm_program')-1).'/adm_program/system/constants.php');
+require_once(substr(__FILE__, 0, strpos(__FILE__, 'adm_program') - 1) . '/adm_program/system/init_globals.php');
+require_once(substr(__FILE__, 0, strpos(__FILE__, 'adm_program') - 1) . '/adm_program/system/constants.php');
 
 // check PHP version and show notice if version is too low
-if(version_compare(phpversion(), MIN_PHP_VERSION) === -1)
+if(version_compare(phpversion(), MIN_PHP_VERSION, '<'))
 {
     exit('<div style="color: #cc0000;">Error: Your PHP version '.phpversion().' does not fulfill
         the minimum requirements for this Admidio version. You need at least PHP '.MIN_PHP_VERSION.' or higher.</div>');
 }
 
-require_once('install_functions.php');
-require_once(SERVER_PATH.'/adm_program/system/string.php');
-require_once(SERVER_PATH.'/adm_program/system/function.php');
+require_once(ADMIDIO_PATH . '/adm_program/installation/install_functions.php');
+require_once(ADMIDIO_PATH . '/adm_program/system/function.php');
+require_once(ADMIDIO_PATH . '/adm_program/system/string.php');
+require_once(ADMIDIO_PATH . '/adm_program/system/logging.php');
 
 // Initialize and check the parameters
 
-define('THEME_PATH', 'layout');
+define('THEME_URL', 'layout');
 $getMode = admFuncVariableIsValid($_GET, 'mode', 'int', array('defaultValue' => 1));
 $message = '';
 
-// set default password-hash algorithm
-if (!isset($gPasswordHashAlgorithm))
-{
-    $gPasswordHashAlgorithm = 'DEFAULT';
-}
-
-// default database type is always MySQL and must be set because of old config files
-if(!isset($gDbType))
-{
-    $gDbType = 'mysql';
-}
-
 // create language and language data object to handle translations
+$language = '';
+
 if(isset($_SESSION['language']))
 {
     $language = $_SESSION['language'];
 }
-else
-{
-    $language = 'en';
-}
+
 $gL10n = new Language();
 $gLanguageData = new LanguageData($language);
+
 $gL10n->addLanguageData($gLanguageData);
+$language = $gL10n->getLanguage();
 
 // if config file exists then connect to database
 if(is_file('../../adm_my_files/config.php'))
 {
     try
     {
-        $db = new Database($gDbType, $g_adm_srv, null, $g_adm_db, $g_adm_usr, $g_adm_pw);
+        $db = new Database($gDbType, $g_adm_srv, $g_adm_port, $g_adm_db, $g_adm_usr, $g_adm_pw);
     }
     catch(AdmException $e)
     {
@@ -122,11 +112,10 @@ if(is_file('../../adm_my_files/config.php'))
     // if config exists then take parameters out of this file
     if($getMode < 3)
     {
-        $_SESSION['create_config_file'] = false;
-
         // save database parameters of config.php in session variables
         $_SESSION['db_type']     = $gDbType;
         $_SESSION['db_server']   = $g_adm_srv;
+        $_SESSION['db_port']     = $g_adm_port;
         $_SESSION['db_user']     = $g_adm_usr;
         $_SESSION['db_password'] = $g_adm_pw;
         $_SESSION['db_database'] = $g_adm_db;
@@ -152,8 +141,8 @@ if($getMode === 1) // (Default) Choose language
     $form = new HtmlFormInstallation('installation-form', 'installation.php?mode=2');
     $form->openGroupBox('gbChooseLanguage', $gL10n->get('INS_CHOOSE_LANGUAGE'));
     $form->addSelectBoxFromXml('system_language', $gL10n->get('SYS_LANGUAGE'),
-                               SERVER_PATH.'/adm_program/languages/languages.xml',
-                               'isocode', 'name', array('property' => FIELD_REQUIRED));
+                               ADMIDIO_PATH.'/adm_program/languages/languages.xml',
+                               'isocode', 'name', array('property' => FIELD_REQUIRED, 'defaultValue' => $gL10n->getLanguage()));
     $form->closeGroupBox();
     $form->addSubmitButton('next_page', $gL10n->get('SYS_NEXT'), array('icon' => 'layout/forward.png'));
     echo $form->show();
@@ -188,6 +177,7 @@ elseif($getMode === 2)  // Welcome to installation
     // deprecated: Remove if PHP 5.3 dropped
     if(ini_get('safe_mode') === '1')
     {
+        $gLogger->warning('DEPRECATED: Safe-Mode is enabled!');
         $message .= '
             <div class="alert alert-warning alert-small" role="alert">
                 <span class="glyphicon glyphicon-warning-sign"></span>'.$gL10n->get('INS_WARNING_SAFE_MODE').'
@@ -208,6 +198,7 @@ elseif($getMode === 3)  // Enter database access information
     {
         $dbType   = $_SESSION['db_type'];
         $server   = $_SESSION['db_server'];
+        $port     = $_SESSION['db_port'];
         $user     = $_SESSION['db_user'];
         $database = $_SESSION['db_database'];
         $prefix   = $_SESSION['prefix'];
@@ -216,6 +207,7 @@ elseif($getMode === 3)  // Enter database access information
     {
         $dbType   = 'mysql';
         $server   = '';
+        $port     = '';
         $user     = '';
         $database = '';
         $prefix   = 'adm';
@@ -225,9 +217,10 @@ elseif($getMode === 3)  // Enter database access information
     $form = new HtmlFormInstallation('installation-form', 'installation.php?mode=4');
     $form->setFormDescription($gL10n->get('INS_DATABASE_LOGIN_DESC'), $gL10n->get('INS_ENTER_LOGIN_TO_DATABASE'));
     $form->openGroupBox('gbChooseLanguage', $gL10n->get('INS_DATABASE_LOGIN'));
-    $form->addSelectBoxFromXml('db_type', $gL10n->get('INS_DATABASE_SYSTEM'), SERVER_PATH.'/adm_program/system/databases.xml',
+    $form->addSelectBoxFromXml('db_type', $gL10n->get('INS_DATABASE_SYSTEM'), ADMIDIO_PATH.'/adm_program/system/databases.xml',
                                'identifier', 'name', array('property' => FIELD_REQUIRED, 'defaultValue' => $dbType));
     $form->addInput('db_server', $gL10n->get('SYS_SERVER'), $server, array('maxLength' => 50, 'property' => FIELD_REQUIRED));
+    $form->addInput('db_port', $gL10n->get('SYS_PORT'), $port, array('type' => 'number', 'minNumber' => 1, 'maxNumber' => 65535, 'step' => 1, 'helpTextIdLabel' => 'INS_DATABASE_PORT_INFO'));
     $form->addInput('db_user', $gL10n->get('SYS_USERNAME'), $user, array('maxLength' => 50, 'property' => FIELD_REQUIRED));
     $form->addInput('db_password', $gL10n->get('SYS_PASSWORD'), null, array('type' => 'password'));
     $form->addInput('db_database', $gL10n->get('SYS_DATABASE'), $database, array('maxLength' => 50, 'property' => FIELD_REQUIRED));
@@ -263,9 +256,16 @@ elseif($getMode === 4)  // Creating organization
             }
         }
 
+        $dbPort = null;
+        if (strStripTags($_POST['db_port']))
+        {
+            $dbPort = (int) strStripTags($_POST['db_port']);
+        }
+
         // Zugangsdaten der DB in Sessionvariablen gefiltert speichern
         $_SESSION['db_type']     = strStripTags($_POST['db_type']);
         $_SESSION['db_server']   = strStripTags($_POST['db_server']);
+        $_SESSION['db_port']     = $dbPort;
         $_SESSION['db_user']     = strStripTags($_POST['db_user']);
         $_SESSION['db_password'] = strStripTags($_POST['db_password']);
         $_SESSION['db_database'] = strStripTags($_POST['db_database']);
@@ -286,7 +286,7 @@ elseif($getMode === 4)  // Creating organization
             // check database connections
             try
             {
-                $db = new Database($_SESSION['db_type'], $_SESSION['db_server'], null, $_SESSION['db_database'], $_SESSION['db_user'], $_SESSION['db_password']);
+                $db = new Database($_SESSION['db_type'], $_SESSION['db_server'], $_SESSION['db_port'], $_SESSION['db_database'], $_SESSION['db_user'], $_SESSION['db_password']);
             }
             catch(AdmException $e)
             {
@@ -488,7 +488,7 @@ elseif($getMode === 6)  // Creating configuration file
     }
 
     // if config file exists than don't create a new one
-    if($_SESSION['create_config_file'] === false)
+    if(is_file('../../adm_my_files/config.php'))
     {
         header('Location: installation.php?mode=8');
         exit();
@@ -501,18 +501,18 @@ elseif($getMode === 6)  // Creating configuration file
     fclose($configFileHandle);
 
     // detect root path
-    $rootPath = $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
-    $rootPath = substr($rootPath, 0, strpos($rootPath, '/adm_program'));
-    if(!strpos($rootPath, 'http://') && !strpos($rootPath, 'https://'))
+    $https = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off';
+    $port = (int) $_SERVER['SERVER_PORT'];
+    $port = ((!$https && $port === 80) || ($https && $port === 443)) ? '' : ':' . $port;
+    $host = isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : $_SERVER['SERVER_NAME'] . $port;
+    $uri = ($https ? 'https' : 'http') . '://' . $host;
+    $admParts = explode('/adm_', $uri . $_SERVER['SCRIPT_NAME']);
+    $rootPath = $admParts[0];
+
+    $port = 'null';
+    if ($_SESSION['db_port'])
     {
-        if(isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
-        {
-            $rootPath = 'https://'. $rootPath;
-        }
-        else
-        {
-            $rootPath = 'http://'. $rootPath;
-        }
+        $port = $_SESSION['db_port'];
     }
 
     // replace placeholders in configuration file structure with data of installation wizard
@@ -520,6 +520,7 @@ elseif($getMode === 6)  // Creating configuration file
         '%PREFIX%'       => $_SESSION['prefix'],
         '%DB_TYPE%'      => $_SESSION['db_type'],
         '%SERVER%'       => $_SESSION['db_server'],
+        '\'%PORT%\''     => $port,
         '%USER%'         => $_SESSION['db_user'],
         '%PASSWORD%'     => $_SESSION['db_password'],
         '%DATABASE%'     => $_SESSION['db_database'],
@@ -551,7 +552,7 @@ elseif($getMode === 6)  // Creating configuration file
     {
         // if user doesn't has write access then create a page with a download link for the config file
         $form = new HtmlFormInstallation('installation-form', 'installation.php?mode=8');
-        $form->setFormDescription($gL10n->get('INS_DOWNLOAD_CONFIGURATION_FILE_DESC', 'config.php', $rootPath.'/adm_my_files', 'adm_my_files'), $gL10n->get('INS_CREATE_CONFIGURATION_FILE'));
+        $form->setFormDescription($gL10n->get('INS_DOWNLOAD_CONFIGURATION_FILE_DESC', 'config.php', $rootPath . '/adm_my_files', 'adm_my_files'), $gL10n->get('INS_CREATE_CONFIGURATION_FILE'));
         $form->addButton('previous_page', $gL10n->get('SYS_BACK'), array('icon' => 'layout/back.png', 'link' => 'installation.php?mode=5'));
         $form->addButton('download_config', $gL10n->get('INS_DOWNLOAD_CONFIGURATION_FILE'), array('icon' => 'layout/page_white_download.png', 'link' => 'installation.php?mode=7'));
         $form->addSubmitButton('next_page', $gL10n->get('INS_INSTALL_ADMIDIO'), array('icon' => 'layout/database_in.png', 'onClickText' => $gL10n->get('INS_DATABASE_WILL_BE_ESTABLISHED')));
@@ -588,6 +589,7 @@ elseif($getMode === 8) // Start installation
     &&    ($g_tbl_praefix  !== $_SESSION['prefix']
         || $gDbType        !== $_SESSION['db_type']
         || $g_adm_srv      !== $_SESSION['db_server']
+        || $g_adm_port     !== $_SESSION['db_port']
         || $g_adm_usr      !== $_SESSION['db_user']
         || $g_adm_pw       !== $_SESSION['db_password']
         || $g_adm_db       !== $_SESSION['db_database']
@@ -598,22 +600,17 @@ elseif($getMode === 8) // Start installation
     }
 
     // read data from sql script db.sql and execute all statements to the current database
-    $filename = 'db_scripts/db.sql';
-    $file     = fopen($filename, 'r')
-                or showNotice($gL10n->get('INS_DATABASE_FILE_NOT_FOUND', 'db.sql', 'adm_program/installation/db_scripts'),
-                              'installation.php?mode=6', $gL10n->get('SYS_BACK'), 'layout/back.png');
-    $content  = fread($file, filesize($filename));
-    $sql_arr  = explode(';', $content);
-    fclose($file);
+    $sqlQueryResult = querySqlFile($db, 'db.sql');
 
-    foreach($sql_arr as $sql)
+    if (is_string($sqlQueryResult))
     {
-        if(trim($sql) !== '')
-        {
-            // Prefix fuer die Tabellen einsetzen und SQL-Statement ausfuehren
-            $sql = str_replace('%PREFIX%', $g_tbl_praefix, $sql);
-            $db->query($sql);
-        }
+        showNotice(
+            $sqlQueryResult,
+            'installation.php?mode=6',
+            $gL10n->get('SYS_BACK'),
+            'layout/back.png'
+        );
+        // => EXIT
     }
 
     // create default data
@@ -743,13 +740,7 @@ female.png|SYS_FEMALE\', 0, 0, 0, 11, '.$gCurrentUser->getValue('usr_id').',\''.
                  , ('.$categoryIdMasterInventory.', \'NUMBER\', \'PRICE\',   \'SYS_QUANTITY\', NULL, 0, 0, 0, 3, '.$gCurrentUser->getValue('usr_id').',\''. DATETIME_NOW.'\') ';
     $db->query($sql);
 
-    if($gDbType === 'pgsql' || $gDbType === 'postgresql') // for backwards compatibility "postgresql"
-    {
-        // soundex is not a default function in PostgreSQL
-        $sql = 'UPDATE '.TBL_PREFERENCES.' SET prf_value = \'0\'
-                 WHERE prf_name LIKE \'system_search_similar\'';
-        $db->query($sql);
-    }
+    disableSoundexSearchIfPgsql($db);
 
     // create new organization
     $gCurrentOrganization = new Organization($db, $_SESSION['orga_shortname']);
@@ -818,7 +809,7 @@ female.png|SYS_FEMALE\', 0, 0, 0, 11, '.$gCurrentUser->getValue('usr_id').',\''.
     }
 
     // show dialog with success notification
-    $form = new HtmlFormInstallation('installation-form', 'http://www.admidio.org/index.php?page=donate');
+    $form = new HtmlFormInstallation('installation-form', ADMIDIO_HOMEPAGE.'donate.php');
     $form->setFormDescription($text, '<div class="alert alert-success form-alert"><span class="glyphicon glyphicon-ok"></span>
                                       <strong>'.$gL10n->get('INS_INSTALLATION_WAS_SUCCESSFUL').'</strong></div>');
     $form->openButtonGroup();

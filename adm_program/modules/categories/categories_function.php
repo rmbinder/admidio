@@ -4,7 +4,7 @@
  * Various functions for categories
  *
  * @copyright 2004-2016 The Admidio Team
- * @see http://www.admidio.org/
+ * @see https://www.admidio.org/
  * @license https://www.gnu.org/licenses/gpl-2.0.html GNU General Public License v2.0 only
  ***********************************************************************************************
  */
@@ -16,6 +16,7 @@
  * type  : Type of categories that could be maintained
  *         ROL = Categories for roles
  *         LNK = Categories for weblinks
+ *         ANN = Categories for announcements
  *         USF = Categories for profile fields
  *         DAT = Calendars for events
  *         INF = Categories for Inventory
@@ -31,7 +32,7 @@ require_once('../../system/login_valid.php');
 
 // Initialize and check the parameters
 $getCatId    = admFuncVariableIsValid($_GET, 'cat_id',   'int');
-$getType     = admFuncVariableIsValid($_GET, 'type',     'string', array('requireValue' => true, 'validValues' => array('ROL', 'LNK', 'USF', 'DAT', 'INF', 'AWA')));
+$getType     = admFuncVariableIsValid($_GET, 'type',     'string', array('requireValue' => true, 'validValues' => array('ROL', 'LNK', 'USF', 'ANN', 'DAT', 'INF', 'AWA')));
 $getMode     = admFuncVariableIsValid($_GET, 'mode',     'int',    array('requireValue' => true));
 $getTitle    = admFuncVariableIsValid($_GET, 'title',    'string', array('defaultValue' => $gL10n->get('SYS_CATEGORY')));
 $getSequence = admFuncVariableIsValid($_GET, 'sequence', 'string', array('validValues' => array('UP', 'DOWN')));
@@ -43,6 +44,11 @@ if($getType === 'ROL' && !$gCurrentUser->manageRoles())
     // => EXIT
 }
 elseif($getType === 'LNK' && !$gCurrentUser->editWeblinksRight())
+{
+    $gMessage->show($gL10n->get('SYS_NO_RIGHTS'));
+    // => EXIT
+}
+elseif($getType === 'ANN' && !$gCurrentUser->editAnnouncements())
 {
     $gMessage->show($gL10n->get('SYS_NO_RIGHTS'));
     // => EXIT

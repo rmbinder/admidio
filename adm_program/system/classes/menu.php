@@ -4,7 +4,7 @@
  * Class manages display of menus
  *
  * @copyright 2004-2016 The Admidio Team
- * @see http://www.admidio.org/
+ * @see https://www.admidio.org/
  * @license https://www.gnu.org/licenses/gpl-2.0.html GNU General Public License v2.0 only
  ***********************************************************************************************
  */
@@ -26,7 +26,6 @@ class Menu
     protected $id;
     protected $title;
     protected $items;
-    protected $root_path;
 
     /**
      * constructor
@@ -35,12 +34,9 @@ class Menu
      */
     public function __construct($id, $title)
     {
-        global $g_root_path;
-
         $this->id        = $id;
         $this->title     = $title;
         $this->items     = array();
-        $this->root_path = $g_root_path;
     }
 
     /**
@@ -56,12 +52,12 @@ class Menu
         // add root path to link unless the full URL is given
         if (preg_match('/^http(s?):\/\//', $link) === 0)
         {
-            $link = $this->root_path . $link;
+            $link = ADMIDIO_URL . $link;
         }
-        // add THEME_PATH to images unless the full URL is given
+        // add THEME_URL to images unless the full URL is given
         if (preg_match('/^http(s?):\/\//', $icon) === 0)
         {
-            $icon = THEME_PATH . $icon;
+            $icon = THEME_URL . $icon;
         }
 
         return array(
@@ -97,7 +93,7 @@ class Menu
         // add root path to link unless the full URL is given
         if (preg_match('/^http(s?):\/\//', $link) === 0)
         {
-            $link = $this->root_path . $link;
+            $link = ADMIDIO_URL . $link;
         }
 
         $this->items[$parentId]['subitems'][$id] = array('link' => $link, 'text' => $text);

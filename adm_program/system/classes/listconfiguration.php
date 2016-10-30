@@ -4,7 +4,7 @@
  * Class manages the list configuration
  *
  * @copyright 2004-2016 The Admidio Team
- * @see http://www.admidio.org/
+ * @see https://www.admidio.org/
  * @license https://www.gnu.org/licenses/gpl-2.0.html GNU General Public License v2.0 only
  ***********************************************************************************************
  */
@@ -219,7 +219,7 @@ class ListConfiguration extends TableLists
 
             // create a valid sort
             $lscSort = $listColumn->getValue('lsc_sort');
-            if($lscSort !== '')
+            if($lscSort != '')
             {
                 if($userFieldType === 'NUMBER' || $userFieldType === 'DECIMAL')
                 {
@@ -243,7 +243,7 @@ class ListConfiguration extends TableLists
             }
 
             // Handle the conditions for the columns
-            if($listColumn->getValue('lsc_filter') !== '')
+            if($listColumn->getValue('lsc_filter') != '')
             {
                 $value = $listColumn->getValue('lsc_filter');
                 $type = '';

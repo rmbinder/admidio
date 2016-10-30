@@ -4,7 +4,7 @@
  * Create and edit rooms
  *
  * @copyright 2004-2016 The Admidio Team
- * @see http://www.admidio.org/
+ * @see https://www.admidio.org/
  * @license https://www.gnu.org/licenses/gpl-2.0.html GNU General Public License v2.0 only
  *
  * Parameters:
@@ -64,7 +64,7 @@ $roomsMenu = $page->getMenu();
 $roomsMenu->addItem('menu_item_back', $gNavigation->getPreviousUrl(), $gL10n->get('SYS_BACK'), 'back.png');
 
 // show form
-$form = new HtmlForm('rooms_edit_form', $g_root_path.'/adm_program/modules/rooms/rooms_function.php?room_id='.$getRoomId.'&amp;mode=1', $page);
+$form = new HtmlForm('rooms_edit_form', ADMIDIO_URL.'/adm_program/modules/rooms/rooms_function.php?room_id='.$getRoomId.'&amp;mode=1', $page);
 $form->openGroupBox('gb_name_properties', $gL10n->get('SYS_NAME').' &amp; '.$gL10n->get('SYS_PROPERTIES'));
 $form->addInput('room_name', $gL10n->get('SYS_ROOM'), $room->getValue('room_name'),
                 array('maxLength' => 100, 'property' => FIELD_REQUIRED));
@@ -77,7 +77,7 @@ $form->openGroupBox('gb_description', $gL10n->get('SYS_DESCRIPTION'), 'admidio-p
 $form->addEditor('room_description', null, $room->getValue('room_description'), array('height' => '150px'));
 $form->closeGroupBox();
 
-$form->addSubmitButton('btn_save', $gL10n->get('SYS_SAVE'), array('icon' => THEME_PATH.'/icons/disk.png'));
+$form->addSubmitButton('btn_save', $gL10n->get('SYS_SAVE'), array('icon' => THEME_URL.'/icons/disk.png'));
 $form->addHtml(admFuncShowCreateChangeInfoById($room->getValue('room_usr_id_create'),
                                                $room->getValue('room_timestamp_create'),
                                                $room->getValue('dat_usr_id_change'),

@@ -8,7 +8,7 @@
  *            in the update scripts
  *
  * @copyright 2004-2016 The Admidio Team
- * @see http://www.admidio.org/
+ * @see https://www.admidio.org/
  * @license https://www.gnu.org/licenses/gpl-2.0.html GNU General Public License v2.0 only
  ***********************************************************************************************
  */
@@ -113,7 +113,7 @@ $orga_preferences = array(
     'lists_roles_per_page'        => '10',
     'lists_members_per_page'      => '25',
     'lists_hide_overview_details' => '0',
-    'lists_default_configuation'  => '',
+    'lists_default_configuration' => '',
 
     // Messages
     'enable_mail_module'          => '1',

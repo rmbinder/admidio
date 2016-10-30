@@ -4,7 +4,7 @@
  * Logout current user and delete cookie
  *
  * @copyright 2004-2016 The Admidio Team
- * @see http://www.admidio.org/
+ * @see https://www.admidio.org/
  * @license https://www.gnu.org/licenses/gpl-2.0.html GNU General Public License v2.0 only
  ***********************************************************************************************
  */
@@ -28,7 +28,7 @@ if (strcasecmp($gCurrentOrganization->getValue('org_shortname'), $g_organization
 $gCurrentUser->clear();
 
 // set homepage to logout page
-$gHomepage = $g_root_path.'/'.$gPreferences['homepage_logout'];
+$gHomepage = ADMIDIO_URL.'/'.$gPreferences['homepage_logout'];
 
 $message_code = 'SYS_LOGOUT_SUCCESSFUL';
 

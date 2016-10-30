@@ -4,7 +4,7 @@
  * RSS feed of announcements
  *
  * @copyright 2004-2016 The Admidio Team
- * @see http://www.admidio.org/
+ * @see https://www.admidio.org/
  * @license https://www.gnu.org/licenses/gpl-2.0.html GNU General Public License v2.0 only
  ***********************************************************************************************
  */
@@ -68,7 +68,7 @@ if($announcements->getDataSetCount() > 0)
         // set data for attributes of this entry
         $title       = $announcement->getValue('ann_headline');
         $description = $announcement->getValue('ann_description');
-        $link        = $g_root_path.'/adm_program/modules/announcements/announcements.php?id='.$announcement->getValue('ann_id').'&headline='.$getHeadline;
+        $link        = ADMIDIO_URL.'/adm_program/modules/announcements/announcements.php?id='.$announcement->getValue('ann_id').'&headline='.$getHeadline;
         $author      = $row['create_name'];
         $pubDate     = date('r', strtotime($announcement->getValue('ann_timestamp_create')));
 

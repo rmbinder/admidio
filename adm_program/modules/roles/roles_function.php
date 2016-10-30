@@ -4,7 +4,7 @@
  * Various functions for roles handling
  *
  * @copyright 2004-2016 The Admidio Team
- * @see http://www.admidio.org/
+ * @see https://www.admidio.org/
  * @license https://www.gnu.org/licenses/gpl-2.0.html GNU General Public License v2.0 only
  ***********************************************************************************************
  */
@@ -69,19 +69,19 @@ if($getMode === 1)
     $page->addHtml('
         <div class="message">
             <p class="lead">
-                <img src="'. THEME_PATH. '/icons/roles_gray.png" alt="'.$gL10n->get('ROL_INACTIV_ROLE').'" />
+                <img src="'. THEME_URL. '/icons/roles_gray.png" alt="'.$gL10n->get('ROL_INACTIV_ROLE').'" />
                 '.$gL10n->get('ROL_INACTIV_ROLE_DESC').'<br /><br />
-                <img src="'. THEME_PATH. '/icons/delete.png" alt="'.$gL10n->get('ROL_ROLE_DELETE').'" />
+                <img src="'. THEME_URL. '/icons/delete.png" alt="'.$gL10n->get('ROL_ROLE_DELETE').'" />
                 '.$gL10n->get('ROL_HINT_DELETE_ROLE', $gL10n->get('SYS_DELETE')).'
             </p>
 
             <button id="btn_inactive" type="button" class="btn btn-primary"
-                onclick="self.location.href=\''.$g_root_path.'/adm_program/modules/roles/roles_function.php?rol_id='.$getRoleId.'&mode=3\'"><img
-                src="'. THEME_PATH. '/icons/roles_gray.png" alt="'.$gL10n->get('ROL_INACTIV_ROLE').'" />&nbsp;'.$gL10n->get('ROL_INACTIV_ROLE').'</button>
+                onclick="self.location.href=\''.ADMIDIO_URL.'/adm_program/modules/roles/roles_function.php?rol_id='.$getRoleId.'&mode=3\'"><img
+                src="'. THEME_URL. '/icons/roles_gray.png" alt="'.$gL10n->get('ROL_INACTIV_ROLE').'" />&nbsp;'.$gL10n->get('ROL_INACTIV_ROLE').'</button>
             &nbsp;&nbsp;&nbsp;&nbsp;
             <button id="btn_delete" type="button" class="btn btn-primary"
-                onclick="self.location.href=\''.$g_root_path.'/adm_program/modules/roles/roles_function.php?rol_id='.$getRoleId.'&mode=4\'"><img
-                src="'. THEME_PATH. '/icons/delete.png" alt="'.$gL10n->get('SYS_DELETE').'" />&nbsp;'.$gL10n->get('SYS_DELETE').'</button>
+                onclick="self.location.href=\''.ADMIDIO_URL.'/adm_program/modules/roles/roles_function.php?rol_id='.$getRoleId.'&mode=4\'"><img
+                src="'. THEME_URL. '/icons/delete.png" alt="'.$gL10n->get('SYS_DELETE').'" />&nbsp;'.$gL10n->get('SYS_DELETE').'</button>
         </div>'
     );
 
@@ -391,7 +391,7 @@ elseif($getMode === 5)
 elseif($getMode === 6)
 {
     // Fragen, ob die inaktive Rolle geloescht werden soll
-    $gMessage->setForwardYesNo($g_root_path.'/adm_program/modules/roles/roles_function.php?rol_id='.$getRoleId.'&amp;mode=4');
+    $gMessage->setForwardYesNo(ADMIDIO_URL.'/adm_program/modules/roles/roles_function.php?rol_id='.$getRoleId.'&amp;mode=4');
     $gMessage->show($gL10n->get('ROL_ROLE_DELETE_DESC', $role->getValue('rol_name')));
     // => EXIT
 }

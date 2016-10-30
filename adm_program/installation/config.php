@@ -4,7 +4,7 @@
  * Configuration file of Admidio
  *
  * @copyright 2004-2016 The Admidio Team
- * @see http://www.admidio.org/
+ * @see https://www.admidio.org/
  * @license https://www.gnu.org/licenses/gpl-2.0.html GNU General Public License v2.0 only
  ***********************************************************************************************
  */
@@ -17,13 +17,14 @@ $gDbType = '%DB_TYPE%';
 $g_tbl_praefix = '%PREFIX%';
 
 // Access to the database of the MySQL-Server
-$g_adm_srv = '%SERVER%';      // Server
-$g_adm_usr = '%USER%';        // User
-$g_adm_pw  = '%PASSWORD%';    // Password
-$g_adm_db  = '%DATABASE%';    // Database
+$g_adm_srv  = '%SERVER%';      // Server
+$g_adm_port = '%PORT%';        // Port
+$g_adm_usr  = '%USER%';        // User
+$g_adm_pw   = '%PASSWORD%';    // Password
+$g_adm_db   = '%DATABASE%';    // Database
 
 // URL to this Admidio installation
-// Example: 'http://www.admidio.org/example'
+// Example: 'https://www.admidio.org/example'
 $g_root_path = '%ROOT_PATH%';
 
 // Short description of the organization that is running Admidio

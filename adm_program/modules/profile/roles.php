@@ -4,7 +4,7 @@
  * Show a list with all roles where the user can assign or remove membership
  *
  * @copyright 2004-2016 The Admidio Team
- * @see http://www.admidio.org/
+ * @see https://www.admidio.org/
  * @license https://www.gnu.org/licenses/gpl-2.0.html GNU General Public License v2.0 only
  ***********************************************************************************************
  */
@@ -65,45 +65,45 @@ if($getInline)
 {
     header('Content-type: text/html; charset=utf-8');
 
-    $html .= '<script type="text/javascript"><!--
-    $(function() {
-        $(".admidio-group-heading").click(function() {
-            showHideBlock($(this).attr("id"));
-        });
+    $html .= '<script type="text/javascript">
+        $(function() {
+            $(".admidio-group-heading").click(function() {
+                showHideBlock($(this).attr("id"));
+            });
 
-        $("#roles_assignment_form").submit(function(event) {
-            var action = $(this).attr("action");
-            var rolesFormAlert = $("#roles_assignment_form .form-alert");
-            rolesFormAlert.hide();
+            $("#roles_assignment_form").submit(function(event) {
+                var action = $(this).attr("action");
+                var rolesFormAlert = $("#roles_assignment_form .form-alert");
+                rolesFormAlert.hide();
 
-            // disable default form submit
-            event.preventDefault();
+                // disable default form submit
+                event.preventDefault();
 
-            $.post({
-                url: action,
-                data: $(this).serialize(),
-                success: function(data) {
-                    if (data === "success") {
-                        rolesFormAlert.attr("class", "alert alert-success form-alert");
-                        rolesFormAlert.html("<span class=\"glyphicon glyphicon-ok\"></span><strong>'.$gL10n->get('SYS_SAVE_DATA').'</strong>");
-                        rolesFormAlert.fadeIn("slow");
-                        setTimeout(function() {
-                            $("#admidio_modal").modal("hide");
-                        }, 2000);
+                $.post({
+                    url: action,
+                    data: $(this).serialize(),
+                    success: function(data) {
+                        if (data === "success") {
+                            rolesFormAlert.attr("class", "alert alert-success form-alert");
+                            rolesFormAlert.html("<span class=\"glyphicon glyphicon-ok\"></span><strong>'.$gL10n->get('SYS_SAVE_DATA').'</strong>");
+                            rolesFormAlert.fadeIn("slow");
+                            setTimeout(function() {
+                                $("#admidio_modal").modal("hide");
+                            }, 2000);
 
-                        profileJS.reloadRoleMemberships();
-                        profileJS.reloadFormerRoleMemberships();
-                        profileJS.reloadFutureRoleMemberships();
-                    } else {
-                        rolesFormAlert.attr("class", "alert alert-danger form-alert");
-                        rolesFormAlert.fadeIn();
-                        rolesFormAlert.html("<span class=\"glyphicon glyphicon-exclamation-sign\"></span>"+data);
+                            profileJS.reloadRoleMemberships();
+                            profileJS.reloadFormerRoleMemberships();
+                            profileJS.reloadFutureRoleMemberships();
+                        } else {
+                            rolesFormAlert.attr("class", "alert alert-danger form-alert");
+                            rolesFormAlert.fadeIn();
+                            rolesFormAlert.html("<span class=\"glyphicon glyphicon-exclamation-sign\"></span>"+data);
+                        }
                     }
-                }
+                });
             });
         });
-    });
-    --></script>
+    </script>
 
     <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
@@ -126,7 +126,7 @@ else
 }
 
 // show headline of module
-$html .= '<form id="roles_assignment_form" action="'.$g_root_path.'/adm_program/modules/profile/roles_save.php?usr_id='.$getUserId.'&amp;new_user='.$getNewUser.'&amp;inline='.$getInline.'" method="post">';
+$html .= '<form id="roles_assignment_form" action="'.ADMIDIO_URL.'/adm_program/modules/profile/roles_save.php?usr_id='.$getUserId.'&amp;new_user='.$getNewUser.'&amp;inline='.$getInline.'" method="post">';
 
 // Create table
 $table = new HtmlTable('role_assignment_table');
@@ -256,16 +256,16 @@ while($row = $statement->fetch())
         // show icon that leaders have no additional rights
         if($role->getValue('rol_leader_rights') == ROLE_LEADER_NO_RIGHTS)
         {
-            $leaderRights .= '<img class="admidio-icon-info" src="'.THEME_PATH.'/icons/info.png"
+            $leaderRights .= '<img class="admidio-icon-info" src="'.THEME_URL.'/icons/info.png"
                                  alt="'.$gL10n->get('ROL_LEADER_NO_ADDITIONAL_RIGHTS').'" title="'.$gL10n->get('ROL_LEADER_NO_ADDITIONAL_RIGHTS').'" />
-                                     <img class="admidio-icon-link" src="'. THEME_PATH. '/icons/dummy.png" alt="dummy" />';
+                                     <img class="admidio-icon-link" src="'. THEME_URL. '/icons/dummy.png" alt="dummy" />';
         }
 
         // show icon with edit user right if leader has this right
         if($role->getValue('rol_leader_rights') == ROLE_LEADER_MEMBERS_EDIT
         || $role->getValue('rol_leader_rights') == ROLE_LEADER_MEMBERS_ASSIGN_EDIT)
         {
-            $leaderRights .= '<img class="admidio-icon-info" src="'.THEME_PATH.'/icons/profile_edit.png"
+            $leaderRights .= '<img class="admidio-icon-info" src="'.THEME_URL.'/icons/profile_edit.png"
                                  alt="'.$gL10n->get('ROL_LEADER_EDIT_MEMBERS').'" title="'.$gL10n->get('ROL_LEADER_EDIT_MEMBERS').'" />';
         }
 
@@ -273,14 +273,14 @@ while($row = $statement->fetch())
         if($role->getValue('rol_leader_rights') == ROLE_LEADER_MEMBERS_ASSIGN
         || $role->getValue('rol_leader_rights') == ROLE_LEADER_MEMBERS_ASSIGN_EDIT)
         {
-            $leaderRights .= '<img class="admidio-icon-info" src="'.THEME_PATH.'/icons/roles.png"
+            $leaderRights .= '<img class="admidio-icon-info" src="'.THEME_URL.'/icons/roles.png"
                                  alt="'.$gL10n->get('ROL_LEADER_ASSIGN_MEMBERS').'" title="'.$gL10n->get('ROL_LEADER_ASSIGN_MEMBERS').'" />';
         }
 
         // show dummy icon if leader has not all rights
         if($role->getValue('rol_leader_rights') != ROLE_LEADER_MEMBERS_ASSIGN_EDIT)
         {
-            $leaderRights .= '<img class="admidio-icon-link" src="'. THEME_PATH. '/icons/dummy.png" alt="dummy" />';
+            $leaderRights .= '<img class="admidio-icon-link" src="'. THEME_URL. '/icons/dummy.png" alt="dummy" />';
         }
         $columnValues[] = $leaderRights;
 
@@ -290,7 +290,7 @@ while($row = $statement->fetch())
 $html .= $table->show();
 
 $html .= '
-    <button class="btn-primary btn" id="btn_save" type="submit"><img src="'.THEME_PATH.'/icons/disk.png" alt="'.$gL10n->get('SYS_SAVE').'" />&nbsp;'.$gL10n->get('SYS_SAVE').'</button>
+    <button class="btn-primary btn" id="btn_save" type="submit"><img src="'.THEME_URL.'/icons/disk.png" alt="'.$gL10n->get('SYS_SAVE').'" />&nbsp;'.$gL10n->get('SYS_SAVE').'</button>
     <div class="form-alert" style="display: none;">&nbsp;</div>
 </form>';
 

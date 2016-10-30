@@ -11,7 +11,7 @@
  * Compatible with Admidio version 3.1
  *
  * @copyright 2004-2016 The Admidio Team
- * @see http://www.admidio.org/
+ * @see https://www.admidio.org/
  * @license https://www.gnu.org/licenses/gpl-2.0.html GNU General Public License v2.0 only
  ***********************************************************************************************
  */
@@ -85,7 +85,7 @@ if(!isset($plg_show_headline) || !is_numeric($plg_show_headline))
 // wenn leer, dann Standardpfad zum Admidio-Modul
 if(!isset($plg_link_url) || $plg_link_url === '')
 {
-    $plg_link_url = $g_root_path.'/adm_program/modules/dates/dates.php';
+    $plg_link_url = ADMIDIO_URL.'/adm_program/modules/dates/dates.php';
 }
 
 // create Object
@@ -206,15 +206,20 @@ function pluginDatesCloseTags($html) {
     preg_match_all('#</([a-z]+)>#iU', $html, $result);
     $closedtags = $result[1];
     $len_opened = count($openedtags);
-    if (count($closedtags) === $len_opened) {
+    if (count($closedtags) === $len_opened)
+    {
         return $html;
     }
     $openedtags = array_reverse($openedtags);
-    for ($i=0; $i < $len_opened; $i++) {
-        if (!in_array($openedtags[$i], $closedtags)) {
+    for ($i = 0; $i < $len_opened; $i++)
+    {
+        if (!in_array($openedtags[$i], $closedtags, true))
+        {
             $html .= '</'.$openedtags[$i].'>';
-        } else {
-            unset($closedtags[array_search($openedtags[$i], $closedtags)]);
+        }
+        else
+        {
+            unset($closedtags[array_search($openedtags[$i], $closedtags, true)]);
         }
     }
     return $html;

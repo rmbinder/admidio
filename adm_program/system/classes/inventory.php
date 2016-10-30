@@ -4,7 +4,7 @@
  * Class handle role rights, cards and other things of users
  *
  * @copyright 2004-2016 The Admidio Team
- * @see http://www.admidio.org/
+ * @see https://www.admidio.org/
  * @license https://www.gnu.org/licenses/gpl-2.0.html GNU General Public License v2.0 only
  ***********************************************************************************************
  */
@@ -120,9 +120,9 @@ class Inventory extends TableInventory
 
         if(strpos($columnName, 'inv_') === 0)
         {
-            if($columnName === 'inv_photo' && is_file(SERVER_PATH. '/adm_my_files/invent_profile_photos/'.$this->getValue('inv_id').'.jpg'))
+            if($columnName === 'inv_photo' && is_file(ADMIDIO_PATH. '/adm_my_files/invent_profile_photos/'.$this->getValue('inv_id').'.jpg'))
             {
-                return file_get_contents(SERVER_PATH. '/adm_my_files/invent_profile_photos/'.$this->getValue('inv_id').'.jpg');
+                return file_get_contents(ADMIDIO_PATH. '/adm_my_files/invent_profile_photos/'.$this->getValue('inv_id').'.jpg');
             }
 
             return parent::getValue($columnName, $format);

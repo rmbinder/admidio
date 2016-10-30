@@ -4,7 +4,7 @@
  * Check if cookies could be created in current browser of the user
  *
  * @copyright 2004-2016 The Admidio Team
- * @see http://www.admidio.org/
+ * @see https://www.admidio.org/
  * @license https://www.gnu.org/licenses/gpl-2.0.html GNU General Public License v2.0 only
  *
  * Parameters:
@@ -30,12 +30,11 @@ else
     // remove login page of URL stack
     $gNavigation->deleteLastUrl();
 
-    $show_time = 2000;
-
+    $showTime = 2000;
     if($getMessageCode !== 'SYS_LOGIN_SUCCESSFUL')
     {
         // Wenn es eine andere Meldung, als eine Standard-Meldung ist, dem User mehr Zeit zum lesen lassen
-        $show_time = 0;
+        $showTime = 0;
     }
 
     // pruefen ob eine Weiterleitungsseite gesetzt wurde, anonsten auf die Startseite verweisen
@@ -43,7 +42,8 @@ else
     {
         $_SESSION['login_forward_url'] = $gHomepage;
     }
-    $gMessage->setForwardUrl($_SESSION['login_forward_url'], $show_time);
+
+    $gMessage->setForwardUrl($_SESSION['login_forward_url'], $showTime);
     unset($_SESSION['login_forward_url']);
 
     $gMessage->show($gL10n->get($getMessageCode));

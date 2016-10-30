@@ -2,7 +2,7 @@
 /**
  ***********************************************************************************************
  * @copyright 2004-2016 The Admidio Team
- * @see http://www.admidio.org/
+ * @see https://www.admidio.org/
  * @license https://www.gnu.org/licenses/gpl-2.0.html GNU General Public License v2.0 only
  ***********************************************************************************************
  */
@@ -18,10 +18,10 @@
  * to the object everytime you submit a url.
  * @par Example 1
  * @code // start the navigation in a module (the object $gNavigation is created in common.php)
- * $gNavigation->addStartUrl('http://www.example.com/index.php', 'Example-Module');
+ * $gNavigation->addStartUrl('https://www.example.com/index.php', 'Example-Module');
  *
  * // add a new url from another page within the same module
- * $gNavigation->addUrl('http://www.example.com/addentry.php', 'Add Entry');
+ * $gNavigation->addUrl('https://www.example.com/addentry.php', 'Add Entry');
  *
  * // optional you can now create the html navigation bar
  * $gNavigation->getHtml();
@@ -136,7 +136,7 @@ class Navigation
         if($url !== '')
         {
             $html = '
-            <a class="btn" href="'.$url.'"><img src="'. THEME_PATH. '/icons/back.png"
+            <a class="btn" href="'.$url.'"><img src="'. THEME_URL. '/icons/back.png"
                 alt="'.$gL10n->get('SYS_BACK').'" />'.$gL10n->get('SYS_BACK').'</a>';
         }
 
@@ -189,7 +189,7 @@ class Navigation
         }
 
         // Only one url, take this one
-        $entry = min(0, $count - 2);
+        $entry = max(0, $count - 2);
 
         return $this->urlStack[$entry]['url'];
     }

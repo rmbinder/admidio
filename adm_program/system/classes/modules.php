@@ -2,7 +2,7 @@
 /**
  ***********************************************************************************************
  * @copyright 2004-2016 The Admidio Team
- * @see http://www.admidio.org/
+ * @see https://www.admidio.org/
  * @license https://www.gnu.org/licenses/gpl-2.0.html GNU General Public License v2.0 only
  ***********************************************************************************************
  */
@@ -41,7 +41,7 @@ abstract class Modules
 {
     const HEADLINE = '';            ///< Constant for language parameter set in module classes
 
-    protected $activeRole;          ///< Boolean 0/1 for active role
+    protected $activeRole;          ///< Boolean false/true for active role
     protected $headline;            ///< String with headline expression
     protected $catId;               ///< ID as integer for chosen category
     protected $id;                  ///< ID as integer to choose record
@@ -72,7 +72,7 @@ abstract class Modules
      */
     public function __construct()
     {
-        $this->activeRole   = '';
+        $this->activeRole   = false;
         $this->headline     = '';
         $this->catId        = 0;
         $this->id           = 0;
@@ -140,11 +140,11 @@ abstract class Modules
     /**
      * Returns a module parameter from the class
      * @param string $parameterName The name of the parameter whose value should be returned.
-     * @return mixed|null Returns the parameter value
+     * @return mixed|null Returns the parameter value or null if parameter didn't exists
      */
     public function getParameter($parameterName)
     {
-        if($parameterName !== '' && is_array($this->parameters) && array_key_exists($parameterName, $this->parameters))
+        if ($parameterName !== '' && array_key_exists($parameterName, $this->parameters))
         {
             return $this->parameters[$parameterName];
         }
@@ -177,7 +177,7 @@ abstract class Modules
     protected function setId()
     {
         // check optional user parameter and make secure. Otherwise set default value
-        $this->id = admFuncVariableIsValid($this->properties, 'id', 'numeric');
+        $this->id = admFuncVariableIsValid($this->properties, 'id', 'int');
     }
 
     /**
@@ -211,29 +211,29 @@ abstract class Modules
     protected function setStartElement()
     {
         // check optional user parameter and make secure. Otherwise set default value
-        $this->start = admFuncVariableIsValid($this->properties, 'start', 'numeric');
+        $this->start = admFuncVariableIsValid($this->properties, 'start', 'int');
     }
 
     /**
      * add a module parameter to the class
      * @param string $parameterName  The name of the parameter that should be added.
-     * @param mixed $parameterValue The value of the parameter that should be added.
+     * @param mixed  $parameterValue The value of the parameter that should be added.
      */
     public function setParameter($parameterName, $parameterValue)
     {
-        if($parameterName !== '')
+        if ($parameterName !== '')
         {
             $this->parameters[$parameterName] = $parameterValue;
 
-            if($parameterName === 'cat_id')
+            if ($parameterName === 'cat_id')
             {
-                $this->catId = $parameterValue;
+                $this->catId = (int) $parameterValue;
             }
-            elseif($parameterName === 'active_role')
+            elseif ($parameterName === 'active_role')
             {
-                $this->activeRole = $parameterValue;
+                $this->activeRole = (bool) $parameterValue;
             }
-            elseif($parameterName === 'mode')
+            elseif ($parameterName === 'mode')
             {
                 $this->mode = $parameterValue;
             }

@@ -2,7 +2,7 @@
 /**
  ***********************************************************************************************
  * @copyright 2004-2016 The Admidio Team
- * @see http://www.admidio.org/
+ * @see https://www.admidio.org/
  * @license https://www.gnu.org/licenses/gpl-2.0.html GNU General Public License v2.0 only
  ***********************************************************************************************
  */
@@ -102,7 +102,7 @@ class InventoryFields
      */
     public function getHtmlValue($fieldNameIntern, $value, $value2 = null)
     {
-        global $gPreferences, $g_root_path, $gL10n;
+        global $gPreferences, $gL10n;
 
         if($value !== '' && array_key_exists($fieldNameIntern, $this->mInventoryFields))
         {
@@ -116,11 +116,11 @@ class InventoryFields
                 case 'CHECKBOX':
                     if($value == '1')
                     {
-                        $htmlValue = '<img src="'.THEME_PATH.'/icons/checkbox_checked.gif" alt="on" />';
+                        $htmlValue = '<img src="'.THEME_URL.'/icons/checkbox_checked.gif" alt="on" />';
                     }
                     else
                     {
-                        $htmlValue = '<img src="'.THEME_PATH.'/icons/checkbox.gif" alt="off" />';
+                        $htmlValue = '<img src="'.THEME_URL.'/icons/checkbox.gif" alt="off" />';
                     }
                     break;
 
@@ -140,7 +140,7 @@ class InventoryFields
                                 $value2 = $this->mItemId;
                             }
 
-                            $emailLink = $g_root_path.'/adm_program/modules/messages/messages_write.php?usr_id='. $value2;
+                            $emailLink = ADMIDIO_URL.'/adm_program/modules/messages/messages_write.php?usr_id='. $value2;
                         }
                         if(strlen($value) > 30)
                         {
@@ -192,7 +192,7 @@ class InventoryFields
                                     }
                                     elseif(admStrIsValidFileName($listValueImage, true))
                                     {
-                                        $listValue = '<img class="admidio-icon-info" src="'.THEME_PATH.'/icons/'.$listValueImage.'" title="'.$listValueText.'" alt="'.$listValueText.'" />';
+                                        $listValue = '<img class="admidio-icon-info" src="'.THEME_URL.'/icons/'.$listValueImage.'" title="'.$listValueText.'" alt="'.$listValueText.'" />';
                                     }
                                 }
                                 catch(AdmException $e)
@@ -212,6 +212,7 @@ class InventoryFields
                         // save values in new array that starts with key = 1
                         $arrListValuesWithKeys[++$key] = $listValue;
                     }
+                    unset($listValue);
                     $htmlValue = $arrListValuesWithKeys[$value];
                     break;
 
@@ -263,7 +264,7 @@ class InventoryFields
             if(array_key_exists($fieldNameIntern, $this->mInventoryFields)
             && $this->mInventoryFields[$fieldNameIntern]->getValue('inf_type') === 'CHECKBOX')
             {
-                $value = '<img src="'.THEME_PATH.'/icons/checkbox.gif" alt="off" />';
+                $value = '<img src="'.THEME_URL.'/icons/checkbox.gif" alt="off" />';
             }
         }
         return $value;

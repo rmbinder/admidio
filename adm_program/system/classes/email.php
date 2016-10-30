@@ -4,7 +4,7 @@
  * Create and send a text or html email with attachments
  *
  * @copyright 2004-2016 The Admidio Team
- * @see http://www.admidio.org/
+ * @see https://www.admidio.org/
  * @license https://www.gnu.org/licenses/gpl-2.0.html GNU General Public License v2.0 only
  ***********************************************************************************************
  */
@@ -203,16 +203,9 @@ class Email extends PHPMailer
         $maxUploadSize = admFuncMaxUploadSize();
         $currentAttachmentSize = $gPreferences['max_email_attachment_size'] * pow(1024, 2);
 
-        if($maxUploadSize < $currentAttachmentSize)
-        {
-            $attachmentSize = $maxUploadSize;
-        }
-        else
-        {
-            $attachmentSize = $currentAttachmentSize;
-        }
+        $attachmentSize = min($maxUploadSize, $currentAttachmentSize);
 
-        switch($sizeUnit)
+        switch ($sizeUnit)
         {
             case 'tib':
                 $attachmentSize /= 1024;
@@ -363,9 +356,7 @@ class Email extends PHPMailer
      */
     public function adminNotfication($subject, $message, $editorName = '', $editorEmail = '')
     {
-        global $gPreferences;
-        global $gCurrentOrganization;
-        global $gL10n;
+        global $gPreferences, $gCurrentOrganization;
 
         if($gPreferences['enable_email_notification'] == 1)
         {

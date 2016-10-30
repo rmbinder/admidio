@@ -4,7 +4,7 @@
  * Create or edit a user profile
  *
  * @copyright 2004-2016 The Admidio Team
- * @see http://www.admidio.org/
+ * @see https://www.admidio.org/
  * @license https://www.gnu.org/licenses/gpl-2.0.html GNU General Public License v2.0 only
  ***********************************************************************************************
  */
@@ -152,7 +152,7 @@ $profileEditMenu = $page->getMenu();
 $profileEditMenu->addItem('menu_item_back', $gNavigation->getPreviousUrl(), $gL10n->get('SYS_BACK'), 'back.png');
 
 // create html form
-$form = new HtmlForm('edit_profile_form', $g_root_path.'/adm_program/modules/profile/profile_save.php?user_id='.$getUserId.'&amp;new_user='.$getNewUser, $page);
+$form = new HtmlForm('edit_profile_form', ADMIDIO_URL.'/adm_program/modules/profile/profile_save.php?user_id='.$getUserId.'&amp;new_user='.$getNewUser, $page);
 
 // *******************************************************************************
 // Loop over all categories and profile fields except the category 'master data'
@@ -248,7 +248,7 @@ foreach($gProfileFields->mProfileFields as $field)
                     {
                         $form->addCustomContent($gL10n->get('SYS_PASSWORD'), '
                             <a id="password_link" class="btn" data-toggle="modal" data-target="#admidio_modal"
-                                href="password.php?usr_id='.$getUserId.'"><img src="'. THEME_PATH. '/icons/key.png"
+                                href="password.php?usr_id='.$getUserId.'"><img src="'. THEME_URL. '/icons/key.png"
                                 alt="'.$gL10n->get('SYS_CHANGE_PASSWORD').'" title="'.$gL10n->get('SYS_CHANGE_PASSWORD').'" />'.$gL10n->get('SYS_CHANGE_PASSWORD').'</a>');
                     }
                 }
@@ -418,7 +418,7 @@ else
     $btn_text  = $gL10n->get('SYS_SAVE');
 }
 
-$form->addSubmitButton('btn_save', $btn_text, array('icon' => THEME_PATH.'/icons/'.$btn_image));
+$form->addSubmitButton('btn_save', $btn_text, array('icon' => THEME_URL.'/icons/'.$btn_image));
 
 if($getNewUser === 0)
 {

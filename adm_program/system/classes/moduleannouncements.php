@@ -2,7 +2,7 @@
 /**
  ***********************************************************************************************
  * @copyright 2004-2016 The Admidio Team
- * @see http://www.admidio.org/
+ * @see https://www.admidio.org/
  * @license https://www.gnu.org/licenses/gpl-2.0.html GNU General Public License v2.0 only
  ***********************************************************************************************
  */
@@ -27,7 +27,7 @@
  *                     [0] => 3
  *                     [ann_id] => 3
  *                     [1] => DEMO
- *                     [ann_org_id] => 1
+ *                     [ann_cat_id] => 1
  *                     [2] => 1
  *                     [ann_global] => 1
  *                     [3] => Willkommen im Demobereich
@@ -93,9 +93,10 @@ class ModuleAnnouncements extends Modules
 
         $sql = 'SELECT COUNT(*) AS count
                   FROM '.TBL_ANNOUNCEMENTS.'
-                 WHERE (  ann_org_id = '. $gCurrentOrganization->getValue('org_id'). '
+                  JOIN '.TBL_CATEGORIES.' ON cat_id = ann_cat_id
+                 WHERE (  cat_org_id = '. $gCurrentOrganization->getValue('org_id'). '
                        OR (   ann_global = 1
-                          AND ann_org_id IN ('.$gCurrentOrganization->getFamilySQL().') ))
+                          AND cat_org_id IN ('.$gCurrentOrganization->getFamilySQL().') ))
                        '.$this->getConditions;
         $pdoStatement = $gDb->query($sql);
 
@@ -117,8 +118,13 @@ class ModuleAnnouncements extends Modules
         {
             $this->getConditions = 'AND ann_id = '.$this->getParameter('id');
         }
+        if($this->getParameter('cat_id') > 0)
+        {
+            $this->getConditions = ' AND cat_id = '. $this->getParameter('cat_id');
+        }
+
         // Search announcements to date
-        elseif (strlen($this->getParameter('dateStartFormatEnglish')) > 0)
+        elseif ($this->getParameter('dateStartFormatEnglish'))
         {
             $this->getConditions = 'AND ann_timestamp_create BETWEEN \''.$this->getParameter('dateStartFormatEnglish').' 00:00:00\' AND \''.$this->getParameter('dateEndFormatEnglish').' 23:59:59\'';
         }
@@ -157,12 +163,13 @@ class ModuleAnnouncements extends Modules
         }
 
         // read announcements from database
-        $sql = 'SELECT ann.*, '.$additionalFields.'
+        $sql = 'SELECT cat.*, ann.*, '.$additionalFields.'
                   FROM '.TBL_ANNOUNCEMENTS.' ann
+                  JOIN '.TBL_CATEGORIES.' cat ON cat_id = ann_cat_id
                        '.$additionalTables.'
-                 WHERE (  ann_org_id = '. $gCurrentOrganization->getValue('org_id'). '
+                 WHERE (  cat_org_id = '. $gCurrentOrganization->getValue('org_id'). '
                        OR (   ann_global = 1
-                          AND ann_org_id IN ('.$gCurrentOrganization->getFamilySQL().') ))
+                          AND cat_org_id IN ('.$gCurrentOrganization->getFamilySQL().') ))
                        '.$this->getConditions.'
               ORDER BY ann_timestamp_create DESC';
 

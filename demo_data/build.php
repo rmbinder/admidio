@@ -4,7 +4,7 @@
  * This script imports a bunch of demo data into a Admidio database
  *
  * @copyright 2004-2016 The Admidio Team
- * @see http://www.admidio.org/
+ * @see https://www.admidio.org/
  * @license https://www.gnu.org/licenses/gpl-2.0.html GNU General Public License v2.0 only
  *
  * Parameters:
@@ -29,9 +29,11 @@ else
     exit('<p style="color: #cc0000;">Error: Config file not found!</p>');
 }
 
-include_once('../adm_program/system/constants.php');
-include_once('../adm_program/system/function.php');
-include_once('../adm_program/system/string.php');
+require_once('../adm_program/system/init_globals.php');
+require_once('../adm_program/system/constants.php');
+require_once('../adm_program/system/function.php');
+require_once('../adm_program/system/string.php');
+require_once('../adm_program/system/logging.php');
 
 // import of demo data must be enabled in config.php
 if(!isset($gImportDemoData) || $gImportDemoData != 1)
@@ -39,12 +41,6 @@ if(!isset($gImportDemoData) || $gImportDemoData != 1)
     exit('<p style="color: #cc0000;">Error: Demo data could not be imported because you have
     not set the preference <strong>gImportDemoData</strong> in your configuration file.</p>
     <p style="color: #cc0000;">Please add the following line to your config.php:<br /><em>$gImportDemoData = 1;</em></p>');
-}
-
-// default database type should be MySQL
-if(!isset($gDbType))
-{
-    $gDbType = 'mysql';
 }
 
 /**
@@ -71,7 +67,7 @@ function getBacktrace()
         }
         else
         {
-            $trace['file'] = str_replace(array(SERVER_PATH, '\\'), array('', '/'), $trace['file']);
+            $trace['file'] = str_replace(array(ADMIDIO_PATH, '\\'), array('', '/'), $trace['file']);
             $trace['file'] = substr($trace['file'], 1);
         }
         $args = array();
@@ -87,9 +83,9 @@ function getBacktrace()
             if (!empty($trace['args'][0]))
             {
                 $argument = htmlentities($trace['args'][0]);
-                $argument = str_replace(array(SERVER_PATH, '\\'), array('', '/'), $argument);
+                $argument = str_replace(array(ADMIDIO_PATH, '\\'), array('', '/'), $argument);
                 $argument = substr($argument, 1);
-                $args[] = "'{$argument}'";
+                $args[] = '\''.$argument.'\'';
             }
         }
 
@@ -121,11 +117,11 @@ echo 'Start with installation ...<br />';
 $gL10n = new Language();
 $gLanguageData = new LanguageData($getLanguage);
 $gL10n->addLanguageData($gLanguageData);
-$gL10n->addLanguagePath(SERVER_PATH. '/demo_data/languages');
+$gL10n->addLanguagePath(ADMIDIO_PATH. '/demo_data/languages');
 
 // copy content of folder adm_my_files to productive folder
-$srcFolder = SERVER_PATH. '/demo_data/adm_my_files';
-$newFolder = SERVER_PATH. '/adm_my_files';
+$srcFolder = ADMIDIO_PATH. '/demo_data/adm_my_files';
+$newFolder = ADMIDIO_PATH. '/adm_my_files';
 
 $myFilesFolder = new Folder($srcFolder);
 $b_return = $myFilesFolder->delete($newFolder.'/backup');
@@ -143,7 +139,7 @@ echo 'Folder <strong>adm_my_files</strong> was successfully copied.<br />';
 // connect to database
 try
 {
-    $db = new Database($gDbType, $g_adm_srv, null, $g_adm_db, $g_adm_usr, $g_adm_pw);
+    $db = new Database($gDbType, $g_adm_srv, $g_adm_port, $g_adm_db, $g_adm_usr, $g_adm_pw);
 }
 catch(AdmException $e)
 {
@@ -245,8 +241,8 @@ if($gDbType === 'mysql')
 }
 
 // create an installation unique cookie prefix and remove special characters
-$gCookiePraefix = 'ADMIDIO_'.$g_organization.'_'.$g_adm_db.'_'.$g_tbl_praefix;
-$gCookiePraefix = strtr($gCookiePraefix, ' .,;:[]', '_______');
+$gCookiePraefix = 'ADMIDIO_' . $g_organization . '_' . $g_adm_db . '_' . $g_tbl_praefix;
+$gCookiePraefix = str_replace(array(' ', '.', ',', ';', ':', '[', ']'), '_', $gCookiePraefix);
 
 // start php session and remove session object with all data, so that
 // all data will be read after the update

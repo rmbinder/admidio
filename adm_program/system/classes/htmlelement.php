@@ -2,7 +2,7 @@
 /**
  ***********************************************************************************************
  * @copyright 2004-2016 The Admidio Team
- * @see http://www.admidio.org/
+ * @see https://www.admidio.org/
  * @license https://www.gnu.org/licenses/gpl-2.0.html GNU General Public License v2.0 only
  ***********************************************************************************************
  */
@@ -85,7 +85,7 @@
  * @code
  * parent::HtmlElement();
  * HtmlElement::addElement('a');
- * HtmlElement::addAttribute('href', 'http://www.admidio.org');
+ * HtmlElement::addAttribute('href', 'https://www.admidio.org/');
  * HtmlElement::addData('Admidio Homepage');
  * $hyperlink = HtmlElement::getHtmlElement();
  * echo $hyperlink;
@@ -122,7 +122,7 @@
  * @endcode
  */
 abstract class HtmlElement {
-    protected $nesting;                   ///< Flag enables nesting of main elements, e.g div blocks ( Default : false )
+    protected $nesting;                   ///< Flag enables nesting of main elements, e.g div blocks ( Default : true )
     protected $mainElement;               ///< String with main element as string
     protected $mainElementAttributes;     ///< String with attributes of the main element
     protected $mainElementWritten;        ///< Flag if the main element was written in the html string
@@ -136,12 +136,10 @@ abstract class HtmlElement {
     /**
      * Constructor initializing all class variables
      *
-     * @param string $element   The html element to be defined
-     * @param string $attribute The Attribute for the html element
-     * @param string $value     Value of the attribute
-     * @param bool   $nesting   Enables nesting of main elements ( Default: False )
+     * @param string $element The html element to be defined
+     * @param bool   $nesting Enables nesting of main elements ( Default: true )
      */
-    public function __construct($element = '', $attribute = '', $value = '', $nesting = false)
+    public function __construct($element, $nesting = true)
     {
         $this->nesting                   = $nesting;
         $this->mainElement               = $element;
@@ -153,11 +151,6 @@ abstract class HtmlElement {
         $this->htmlString                = '';
         $this->parentFlag                = false;
         $this->arrParentElements         = array();
-
-        if ($attribute !== '')
-        {
-            $this->mainElementAttributes[$attribute] = $value;
-        }
     }
 
     /**

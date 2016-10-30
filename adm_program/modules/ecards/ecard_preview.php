@@ -4,7 +4,7 @@
  * Preview of ecard
  *
  * @copyright 2004-2016 The Admidio Team
- * @see http://www.admidio.org/
+ * @see https://www.admidio.org/
  * @license https://www.gnu.org/licenses/gpl-2.0.html GNU General Public License v2.0 only
  ***********************************************************************************************
  */
@@ -37,7 +37,7 @@ if(isset($_POST['ecard_message']))
     $ecardMessage = $_POST['ecard_message'];
 }
 
-$imageUrl = $g_root_path.'/adm_program/modules/photos/photo_show.php?pho_id='.$postPhotoId.'&photo_nr='.$postPhotoNr.'&max_width='.$gPreferences['ecard_thumbs_scale'].'&max_height='.$gPreferences['ecard_thumbs_scale'];
+$imageUrl = ADMIDIO_URL.'/adm_program/modules/photos/photo_show.php?pho_id='.$postPhotoId.'&photo_nr='.$postPhotoNr.'&max_width='.$gPreferences['ecard_thumbs_scale'].'&max_height='.$gPreferences['ecard_thumbs_scale'];
 
 $funcClass = new FunctionClass($gL10n);
 

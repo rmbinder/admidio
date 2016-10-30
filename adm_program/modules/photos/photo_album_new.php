@@ -4,7 +4,7 @@
  * Create and edit photo alben
  *
  * @copyright 2004-2016 The Admidio Team
- * @see http://www.admidio.org/
+ * @see https://www.admidio.org/
  * @license https://www.gnu.org/licenses/gpl-2.0.html GNU General Public License v2.0 only
  *
  * Parameters:
@@ -135,7 +135,7 @@ else
 }
 
 // show form
-$form = new HtmlForm('photo_album_edit_form', $g_root_path.'/adm_program/modules/photos/photo_album_function.php?pho_id='.$getPhotoId.'&amp;mode='.$getMode, $page);
+$form = new HtmlForm('photo_album_edit_form', ADMIDIO_URL.'/adm_program/modules/photos/photo_album_function.php?pho_id='.$getPhotoId.'&amp;mode='.$getMode, $page);
 $form->addInput('pho_name', $gL10n->get('PHO_ALBUM'), $photoAlbum->getValue('pho_name'), array('property' => FIELD_REQUIRED, 'maxLength' => 50));
 subfolder(null, '', $photoAlbum, $getPhotoId);
 $form->addSelectBox('pho_pho_id_parent', $gL10n->get('PHO_PARENT_ALBUM'), $photoAlbumsArray, array('property'                       => FIELD_REQUIRED,
@@ -147,7 +147,7 @@ $form->addInput('pho_end', $gL10n->get('SYS_END'), $photoAlbum->getValue('pho_en
 $form->addInput('pho_photographers', $gL10n->get('PHO_PHOTOGRAPHER'), $photoAlbum->getValue('pho_photographers'), array('maxLength' => 100));
 $form->addCheckbox('pho_locked', $gL10n->get('PHO_ALBUM_LOCK'), $photoAlbum->getValue('pho_locked'), array('helpTextIdLabel' => 'PHO_ALBUM_LOCK_DESC'));
 
-$form->addSubmitButton('btn_save', $gL10n->get('SYS_SAVE'), array('icon' => THEME_PATH.'/icons/disk.png'));
+$form->addSubmitButton('btn_save', $gL10n->get('SYS_SAVE'), array('icon' => THEME_URL.'/icons/disk.png'));
 $form->addHtml(admFuncShowCreateChangeInfoById($photoAlbum->getValue('pho_usr_id_create'), $photoAlbum->getValue('pho_timestamp_create'), $photoAlbum->getValue('pho_usr_id_change'), $photoAlbum->getValue('pho_timestamp_change')));
 
 // add form to html page and show page

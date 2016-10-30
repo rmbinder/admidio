@@ -4,7 +4,7 @@
  * Validate login data, create cookie and sign in the user to Admidio
  *
  * @copyright 2004-2016 The Admidio Team
- * @see http://www.admidio.org/
+ * @see https://www.admidio.org/
  * @license https://www.gnu.org/licenses/gpl-2.0.html GNU General Public License v2.0 only
  ***********************************************************************************************
  */
@@ -119,12 +119,12 @@ else
         // falls noch keine Forward-Url gesetzt wurde, dann nach dem Login auf die Startseite verweisen
         if(!array_key_exists('login_forward_url', $_SESSION))
         {
-            $_SESSION['login_forward_url'] = $g_root_path . '/' . $gPreferences['homepage_login'];
+            $_SESSION['login_forward_url'] = ADMIDIO_URL . '/' . $gPreferences['homepage_login'];
         }
 
         // bevor zur entsprechenden Seite weitergeleitet wird, muss noch geprueft werden,
         // ob der Browser Cookies setzen darf -> sonst kein Login moeglich
-        $location = 'Location: ' . $g_root_path . '/adm_program/system/cookie_check.php?message_code=' . $loginMessage;
+        $location = 'Location: ' . ADMIDIO_URL . '/adm_program/system/cookie_check.php?message_code=' . $loginMessage;
         header($location);
         exit();
     }

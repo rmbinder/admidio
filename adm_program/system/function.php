@@ -4,7 +4,7 @@
  * Various common functions
  *
  * @copyright 2004-2016 The Admidio Team
- * @see http://www.admidio.org/
+ * @see https://www.admidio.org/
  * @license https://www.gnu.org/licenses/gpl-2.0.html GNU General Public License v2.0 only
  ***********************************************************************************************
  */
@@ -18,36 +18,30 @@
  */
 function admFuncAutoload($className)
 {
-    $fileName = SERVER_PATH.'/adm_program/system/classes/'.strtolower($className).'.php';
+    global $gLogger;
 
-    if (is_file($fileName))
+    $libFiles = array(
+        ADMIDIO_PATH . '/adm_program/system/classes/' . strtolower($className) . '.php',
+        ADMIDIO_PATH . '/adm_program/libs/monolog/src/' . str_replace('\\', '/', $className) . '.php',
+//        ADMIDIO_PATH . '/adm_program/libs/phpass/' . strtolower($className) . '.php',
+        ADMIDIO_PATH . '/adm_program/libs/phpmailer/class.' . strtolower($className) . '.php',
+        ADMIDIO_PATH . '/adm_program/libs/psr/log/' . str_replace('\\', '/', $className) . '.php',
+//        ADMIDIO_PATH . '/adm_program/libs/securimage/' . strtolower($className) . '.php',
+        ADMIDIO_PATH . '/adm_program/libs/zxcvbn-php/src/' . substr(str_replace('\\', '/', $className), 9) . '.php'
+    );
+
+    foreach ($libFiles as $libFile)
     {
-        include($fileName);
-    }
-    else
-    {
-        $fileName = SERVER_PATH.'/adm_program/libs/phpmailer/class.'.strtolower($className).'.php';
-
-        if (is_file($fileName))
+        if (is_file($libFile))
         {
-            include($fileName);
-        }
-        else
-        {
-            $fileName = SERVER_PATH.'/adm_program/libs/zxcvbn-php/src/'.str_replace('\\', '/', $className).'.php';
-
-            if (is_file($fileName))
-            {
-                include($fileName);
-            }
-            else
-            {
-                return false;
-            }
+            include($libFile);
+            return null;
         }
     }
 
-    return null;
+    $gLogger->critical('Class-File for Class "' . $className . '" could not be found and included!');
+
+    return false;
 }
 
 // now register this function in this script so only function.php must be included for autoload
@@ -677,7 +671,7 @@ function admFuncShowCreateChangeInfoById($userIdCreated, $timestampCreate, $user
  */
 function admFuncShowCreateChangeInfoByName($userNameCreated, $timestampCreate, $userNameEdited, $timestampEdited, $userIdCreated = 0, $userIdEdited = 0)
 {
-    global $gL10n, $gValidLogin, $g_root_path, $gPreferences;
+    global $gL10n, $gValidLogin, $gPreferences;
 
     $html = '';
 
@@ -697,7 +691,7 @@ function admFuncShowCreateChangeInfoByName($userNameCreated, $timestampCreate, $
             // if valid login and a user id is given than create a link to the profile of this user
             if($gValidLogin && $userIdCreated > 0 && $userNameCreated !== $gL10n->get('SYS_SYSTEM'))
             {
-                $userNameCreated = '<a href="'.$g_root_path.'/adm_program/modules/profile/profile.php?user_id='.
+                $userNameCreated = '<a href="'.ADMIDIO_URL.'/adm_program/modules/profile/profile.php?user_id='.
                                     $userIdCreated.'">'.$userNameCreated.'</a>';
             }
 
@@ -717,7 +711,7 @@ function admFuncShowCreateChangeInfoByName($userNameCreated, $timestampCreate, $
             // if valid login and a user id is given than create a link to the profile of this user
             if($gValidLogin && $userIdEdited > 0 && $userNameEdited !== $gL10n->get('SYS_SYSTEM'))
             {
-                $userNameEdited = '<a href="'.$g_root_path.'/adm_program/modules/profile/profile.php?user_id='.
+                $userNameEdited = '<a href="'.ADMIDIO_URL.'/adm_program/modules/profile/profile.php?user_id='.
                                    $userIdEdited.'">'.$userNameEdited.'</a>';
             }
 

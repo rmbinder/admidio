@@ -4,31 +4,31 @@
 --
 
 INSERT INTO %PREFIX%_components (com_type, com_name, com_name_intern, com_version, com_beta, com_update_step)
-                         VALUES ('SYSTEM', 'Admidio Core', 'CORE', '3.1.6', 0, 500)
-                              , ('MODULE', 'ANN_ANNOUNCEMENTS', 'ANNOUCEMENTS', '3.1.6', 0, 0)
-                              , ('MODULE', 'BAC_DATABASE_BACKUP', 'BACKUP', '3.1.6', 0, 0)
-                              , ('MODULE', 'SYS_CATEGORIES', 'CATEGORIES', '3.1.6', 0, 0)
-                              , ('MODULE', 'DAT_DATES', 'DATES', '3.1.6', 0, 0)
-                              , ('MODULE', 'DOW_DOWNLOADS', 'DOWNLOADS', '3.1.6', 0, 0)
-                              , ('MODULE', 'GBO_GUESTBOOK', 'GUESTBOOK', '3.1.6', 0, 0)
-                              , ('MODULE', 'LNK_WEBLINKS', 'LINKS', '3.1.6', 0, 0)
-                              , ('MODULE', 'LST_LISTS', 'LISTS', '3.1.6', 0, 0)
-                              , ('MODULE', 'MEM_USER_MANAGEMENT', 'MEMBERS', '3.1.6', 0, 0)
-                              , ('MODULE', 'SYS_MESSAGES', 'MESSAGES', '3.1.6', 0, 0)
-                              , ('MODULE', 'PHO_PHOTOS', 'PHOTOS', '3.1.6', 0, 0)
-                              , ('MODULE', 'SYS_SETTINGS', 'PREFERENCES', '3.1.6', 0, 0)
-                              , ('MODULE', 'PRO_PROFILE', 'PROFILE', '3.1.6', 0, 0)
-                              , ('MODULE', 'SYS_REGISTRATION', 'REGISTRATION', '3.1.6', 0, 0)
-                              , ('MODULE', 'ROL_ROLE_ADMINISTRATION', 'ROLES', '3.1.6', 0, 0)
-                              , ('MODULE', 'ROO_ROOM_MANAGEMENT', 'ROOMS', '3.1.6', 0, 0);
+                         VALUES ('SYSTEM', 'Admidio Core', 'CORE', '3.1.8', 0, 500)
+                              , ('MODULE', 'ANN_ANNOUNCEMENTS', 'ANNOUCEMENTS', '3.1.8', 0, 0)
+                              , ('MODULE', 'BAC_DATABASE_BACKUP', 'BACKUP', '3.1.8', 0, 0)
+                              , ('MODULE', 'SYS_CATEGORIES', 'CATEGORIES', '3.1.8', 0, 0)
+                              , ('MODULE', 'DAT_DATES', 'DATES', '3.1.8', 0, 0)
+                              , ('MODULE', 'DOW_DOWNLOADS', 'DOWNLOADS', '3.1.8', 0, 0)
+                              , ('MODULE', 'GBO_GUESTBOOK', 'GUESTBOOK', '3.1.8', 0, 0)
+                              , ('MODULE', 'LNK_WEBLINKS', 'LINKS', '3.1.8', 0, 0)
+                              , ('MODULE', 'LST_LISTS', 'LISTS', '3.1.8', 0, 0)
+                              , ('MODULE', 'MEM_USER_MANAGEMENT', 'MEMBERS', '3.1.8', 0, 0)
+                              , ('MODULE', 'SYS_MESSAGES', 'MESSAGES', '3.1.8', 0, 0)
+                              , ('MODULE', 'PHO_PHOTOS', 'PHOTOS', '3.1.8', 0, 0)
+                              , ('MODULE', 'SYS_SETTINGS', 'PREFERENCES', '3.1.8', 0, 0)
+                              , ('MODULE', 'PRO_PROFILE', 'PROFILE', '3.1.8', 0, 0)
+                              , ('MODULE', 'SYS_REGISTRATION', 'REGISTRATION', '3.1.8', 0, 0)
+                              , ('MODULE', 'ROL_ROLE_ADMINISTRATION', 'ROLES', '3.1.8', 0, 0)
+                              , ('MODULE', 'ROO_ROOM_MANAGEMENT', 'ROOMS', '3.1.8', 0, 0);
 
 --
 -- Data for table adm_organizations
 --
 
 INSERT INTO %PREFIX%_organizations (org_id, org_longname, org_shortname, org_org_id_parent, org_homepage) VALUES
-(1, 'Demo-Organisation', 'DEMO', NULL, 'http://demo.admidio.org'),
-(2, 'Test-Organisation', 'TEST', 1, 'http://demo.admidio.org');
+(1, 'Demo-Organisation', 'DEMO', NULL, 'https://demo.admidio.org/'),
+(2, 'Test-Organisation', 'TEST', 1, 'https://demo.admidio.org/');
 
 --
 -- Data for table adm_preferences
@@ -78,7 +78,7 @@ INSERT INTO %PREFIX%_preferences (prf_id, prf_org_id, prf_name, prf_value) VALUE
 (6500, 1, 'lists_hide_overview_details', '0'),
 (6600, 1, 'lists_members_per_page', '25'),
 (6700, 1, 'lists_roles_per_page', '10'),
-(6705, 1, 'lists_default_configuation', '1'),
+(6705, 1, 'lists_default_configuration', '1'),
 (6800, 1, 'logout_minutes', '20'),
 (6900, 1, 'mail_bcc_count', '50'),
 (6910, 1, 'mail_character_encoding', 'utf-8'),
@@ -104,6 +104,7 @@ INSERT INTO %PREFIX%_preferences (prf_id, prf_org_id, prf_name, prf_value) VALUE
 (7251, 1, 'members_days_field_history', '365'),
 (7252, 1, 'members_show_all_users', '1'),
 (7300, 1, 'photo_image_text', '© demo.admidio.org'),
+(7305, 1, 'photo_image_text_size', '40'),
 (7350, 1, 'photo_albums_per_page', '16'),
 (7400, 1, 'photo_save_scale', '640'),
 (7500, 1, 'photo_show_width', '640'),
@@ -185,7 +186,7 @@ INSERT INTO %PREFIX%_preferences (prf_id, prf_org_id, prf_name, prf_value) VALUE
 (65001, 2, 'lists_hide_overview_details', '0'),
 (66001, 2, 'lists_members_per_page', '25'),
 (67001, 2, 'lists_roles_per_page', '10'),
-(67005, 2, 'lists_default_configuation', '9'),
+(67005, 2, 'lists_default_configuration', '9'),
 (68001, 2, 'logout_minutes', '20'),
 (69001, 2, 'mail_bcc_count', '50'),
 (69100, 2, 'mail_character_encoding', 'utf-8'),
@@ -210,8 +211,9 @@ INSERT INTO %PREFIX%_preferences (prf_id, prf_org_id, prf_name, prf_value) VALUE
 (72500, 2, 'members_users_per_page', '25'),
 (72510, 2, 'members_days_field_history', '365'),
 (72520, 2, 'members_show_all_users', '0'),
-(73050, 2, 'photo_albums_per_page', '16'),
-(73001, 2, 'photo_image_text', '© demo.admidio.org'),
+(73000, 2, 'photo_albums_per_page', '16'),
+(73025, 2, 'photo_image_text', '© demo.admidio.org'),
+(73050, 2, 'photo_image_text_size', '40'),
 (74001, 2, 'photo_save_scale', '640'),
 (75001, 2, 'photo_show_width', '640'),
 (76001, 2, 'photo_show_height', '480'),
@@ -582,7 +584,7 @@ INSERT INTO %PREFIX%_files (fil_id, fil_fol_id, fil_name, fil_description, fil_l
 --
 
 INSERT INTO %PREFIX%_guestbook (gbo_id, gbo_org_id, gbo_name, gbo_text, gbo_email, gbo_homepage, gbo_ip_address, gbo_locked, gbo_usr_id_create, gbo_timestamp_create, gbo_usr_id_change, gbo_timestamp_change) VALUES
-(1, 1, 'Paul Webmaster', 'DEMO_GBO_WEBMASTER_WELCOME', 'webmaster@admidio.org', 'http://www.admidio.org', '84.63.38.55', 0, 1, '2011-12-25 12:14:42', NULL, NULL),
+(1, 1, 'Paul Webmaster', 'DEMO_GBO_WEBMASTER_WELCOME', 'webmaster@admidio.org', 'https://www.admidio.org/', '84.63.38.55', 0, 1, '2011-12-25 12:14:42', NULL, NULL),
 (2, 1, 'Sepp Mayerchen', 'DEMO_GBO_GUEST_ENTRY1', NULL, NULL, '84.63.38.55', 0, NULL, '2012-01-03 20:16:42', NULL, NULL);
 
 --
@@ -597,10 +599,10 @@ INSERT INTO %PREFIX%_guestbook_comments (gbc_id, gbc_gbo_id, gbc_name, gbc_text,
 --
 
 INSERT INTO %PREFIX%_links (lnk_id, lnk_cat_id, lnk_name, lnk_description, lnk_url, lnk_counter, lnk_usr_id_create, lnk_timestamp_create, lnk_usr_id_change, lnk_timestamp_change) VALUES
-(1, 7, 'DEMO_LNK_SAMPLE_PAGE', 'DEMO_LNK_SAMPLE_PAGE_CONTENT', 'http://www.example.com', 6, 1, '2012-01-04 22:13:26', 1, '2012-01-05 21:16:32'),
-(2, 9, 'Admidio', 'DEMO_LNK_ADMIDIO_CONTENT', 'http://www.admidio.org', 157, 1, '2012-01-08 11:12:05', NULL, NULL),
-(3, 9, 'DEMO_LNK_FORUM', 'DEMO_LNK_FORUM_CONTENT', 'http://forum.admidio.org', 46, 1, '2012-01-04 21:15:44', NULL, NULL),
-(4, 9, 'DEMO_LNK_DOCUMENTATION', 'DEMO_LNK_DOCUMENTATION_CONTENT', 'http://www.admidio.org/dokuwiki', 21, 1, '2012-04-05 14:13:23', NULL, NULL);
+(1, 7, 'DEMO_LNK_SAMPLE_PAGE', 'DEMO_LNK_SAMPLE_PAGE_CONTENT', 'https://www.example.com', 6, 1, '2012-01-04 22:13:26', 1, '2012-01-05 21:16:32'),
+(2, 9, 'Admidio', 'DEMO_LNK_ADMIDIO_CONTENT', 'https://www.admidio.org/', 157, 1, '2012-01-08 11:12:05', NULL, NULL),
+(3, 9, 'DEMO_LNK_FORUM', 'DEMO_LNK_FORUM_CONTENT', 'https://forum.admidio.org/', 46, 1, '2012-01-04 21:15:44', NULL, NULL),
+(4, 9, 'DEMO_LNK_DOCUMENTATION', 'DEMO_LNK_DOCUMENTATION_CONTENT', 'https://www.admidio.org/dokuwiki', 21, 1, '2012-04-05 14:13:23', NULL, NULL);
 
 --
 -- Data for table adm_lists
@@ -973,7 +975,7 @@ INSERT INTO %PREFIX%_user_data (usd_id, usd_usr_id, usd_usf_id, usd_value) VALUE
 (8, 1, 10, '1968-04-16'),
 (9, 1, 11, '1'),
 (10, 1, 12, 'webmaster@admidio.org'),
-(11, 1, 13, 'http://www.admidio.org'),
+(11, 1, 13, 'https://www.admidio.org/'),
 (12, 1, 20, '001'),
 (13, 1, 21, 'blau'),
 (13000, 1, 22, 'Admidio'),
@@ -2758,7 +2760,7 @@ INSERT INTO %PREFIX%_user_data (usd_id, usd_usr_id, usd_usf_id, usd_value) VALUE
 (1787, 351, 10, '1973-12-24'),
 (1788, 351, 11, '1'),
 (1789, 351, 12, 'demo@admidio.org'),
-(1790, 351, 13, 'http://demo.admidio.org'),
+(1790, 351, 13, 'https://demo.admidio.org/'),
 (1791, 351, 14, 'Demouser'),
 (1792, 351, 20, '4711'),
 (17921, 351, 25, '3'),

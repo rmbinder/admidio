@@ -2,7 +2,7 @@
 /**
  ***********************************************************************************************
  * @copyright 2004-2016 The Admidio Team
- * @see http://www.admidio.org/
+ * @see https://www.admidio.org/
  * @license https://www.gnu.org/licenses/gpl-2.0.html GNU General Public License v2.0 only
  ***********************************************************************************************
  */
@@ -52,8 +52,6 @@ class Component extends TableAccess
      */
     public function checkDatabaseVersion()
     {
-        global $g_root_path;
-
         $dbVersion = $this->getValue('com_version');
         if ($this->getValue('com_beta') > 0)
         {
@@ -71,12 +69,12 @@ class Component extends TableAccess
         if ($returnCode === -1) // database has minor version
         {
             throw new AdmException('SYS_DATABASE_VERSION_INVALID', $dbVersion, ADMIDIO_VERSION_TEXT,
-                                   '<a href="'.$g_root_path.'/adm_program/installation/update.php">', '</a>');
+                                   '<a href="'.ADMIDIO_URL.'/adm_program/installation/update.php">', '</a>');
         }
         elseif ($returnCode === 1) // filesystem has minor version
         {
             throw new AdmException('SYS_FILESYSTEM_VERSION_INVALID', $dbVersion, ADMIDIO_VERSION_TEXT,
-                                   '<a href="http://www.admidio.org/index.php?page=download">', '</a>');
+                                   '<a href="'.ADMIDIO_HOMEPAGE.'download.php">', '</a>');
         }
     }
 }
