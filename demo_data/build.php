@@ -111,17 +111,27 @@ $getLanguage = admFuncVariableIsValid($_GET, 'lang', 'string', array('defaultVal
 // but no output of error message because of safe mode
 @set_time_limit(1000);
 
+// create an installation unique cookie prefix and remove special characters
+$gCookiePraefix = 'ADMIDIO_' . $g_organization . '_' . $g_adm_db . '_' . $g_tbl_praefix;
+$gCookiePraefix = str_replace(array(' ', '.', ',', ';', ':', '[', ']'), '_', $gCookiePraefix);
+
+// start php session and remove session object with all data, so that
+// all data will be read after the update
+session_name($gCookiePraefix. '_PHP_ID');
+session_start();
+unset($_SESSION['gCurrentSession']);
+
 echo 'Start with installation ...<br />';
 
 // create language and language data object to handle translations
 $gL10n = new Language();
 $gLanguageData = new LanguageData($getLanguage);
 $gL10n->addLanguageData($gLanguageData);
-$gL10n->addLanguagePath(ADMIDIO_PATH. '/demo_data/languages');
+$gL10n->addLanguagePath(ADMIDIO_PATH . '/demo_data/languages');
 
 // copy content of folder adm_my_files to productive folder
-$srcFolder = ADMIDIO_PATH. '/demo_data/adm_my_files';
-$newFolder = ADMIDIO_PATH. '/adm_my_files';
+$srcFolder = ADMIDIO_PATH . '/demo_data/adm_my_files';
+$newFolder = ADMIDIO_PATH . FOLDER_DATA;
 
 $myFilesFolder = new Folder($srcFolder);
 $b_return = $myFilesFolder->delete($newFolder.'/backup');
@@ -239,16 +249,6 @@ if($gDbType === 'mysql')
     $sql = 'SET foreign_key_checks = 1 ';
     $db->query($sql);
 }
-
-// create an installation unique cookie prefix and remove special characters
-$gCookiePraefix = 'ADMIDIO_' . $g_organization . '_' . $g_adm_db . '_' . $g_tbl_praefix;
-$gCookiePraefix = str_replace(array(' ', '.', ',', ';', ':', '[', ']'), '_', $gCookiePraefix);
-
-// start php session and remove session object with all data, so that
-// all data will be read after the update
-session_name($gCookiePraefix. '_PHP_ID');
-session_start();
-unset($_SESSION['gCurrentSession']);
 
 echo 'Installation successful !<br />';
 

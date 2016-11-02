@@ -27,7 +27,7 @@ if ($gDebug)
 $gLogger->pushProcessor(new IntrospectionProcessor($logLevel));
 
 $formatter = new LineFormatter(null, null, false, true);
-$streamHandler = new StreamHandler(SERVER_PATH . '/adm_my_files/logs/admidio.log', $logLevel);
+$streamHandler = new StreamHandler(SERVER_PATH . FOLDER_DATA . '/logs/admidio.log', $logLevel, true, 0777);
 $errorLogHandler = new ErrorLogHandler(ErrorLogHandler::OPERATING_SYSTEM, Logger::ERROR);
 
 $streamHandler->setFormatter($formatter);
@@ -38,5 +38,5 @@ $gLogger->pushHandler($errorLogHandler);
 
 $gLogger->info('#################################################################################################');
 $gLogger->info('Admidio Logger initialized');
-$gLogger->info($_SERVER['REQUEST_URI'] . '?' . $_SERVER['QUERY_STRING']);
+$gLogger->info(CURRENT_URL);
 $gLogger->info('Memory usage: ' . round(memory_get_usage() / 1024, 1) . ' KB');

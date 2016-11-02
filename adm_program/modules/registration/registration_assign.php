@@ -83,23 +83,22 @@ $sql = 'SELECT usr_id, usr_login_name, last_name.usd_value AS last_name,
          WHERE usr_valid = 1
            AND '.$sql_similar_name;
 $usrStatement = $gDb->query($sql);
-$members_found = $usrStatement->rowCount();
 
 // if current user can edit profiles than create link to profile otherwise create link to auto assign new registration
 if($gCurrentUser->editUsers())
 {
-    $urlCreateNewUser = ADMIDIO_URL.'/adm_program/modules/profile/profile_new.php?new_user=3&user_id='.$getNewUserId;
+    $urlCreateNewUser = ADMIDIO_URL . FOLDER_MODULES.'/profile/profile_new.php?new_user=3&user_id=' . $getNewUserId;
 }
 else
 {
-    $urlCreateNewUser = ADMIDIO_URL.'/adm_program/modules/registration/registration_function.php?mode=5&new_user_id='.$getNewUserId;
+    $urlCreateNewUser = ADMIDIO_URL . FOLDER_MODULES.'/registration/registration_function.php?mode=5&new_user_id=' . $getNewUserId;
 }
 
-if($members_found === 0)
+if($usrStatement->rowCount() === 0)
 {
     // if user doesn't exists than show profile or auto assign roles
-    header('Location: '.$urlCreateNewUser);
-    exit();
+    admRedirect($urlCreateNewUser);
+    // => EXIT
 }
 
 $gNavigation->addUrl(CURRENT_URL, $headline);
@@ -127,7 +126,7 @@ while($row = $usrStatement->fetchObject())
         $page->addHtml('<hr />');
     }
     $page->addHtml('<p>
-        <a class="btn" href="'. ADMIDIO_URL. '/adm_program/modules/profile/profile.php?user_id='.$row->usr_id.'"><img
+        <a class="btn" href="'. ADMIDIO_URL. FOLDER_MODULES.'/profile/profile.php?user_id='.$row->usr_id.'"><img
             src="'.THEME_URL.'/icons/profile.png" alt="'.$gL10n->get('SYS_SHOW_PROFILE').'" />'.$row->first_name.' '.$row->last_name.'</a><br />');
 
         if($row->address !== '')
@@ -142,7 +141,7 @@ while($row = $usrStatement->fetchObject())
         {
             if($gPreferences['enable_mail_module'] == 1)
             {
-                $page->addHtml('<a href="'.ADMIDIO_URL.'/adm_program/modules/messages/messages_write.php?usr_id='.$row->usr_id.'">'.$row->email.'</a><br />');
+                $page->addHtml('<a href="'.ADMIDIO_URL.FOLDER_MODULES.'/messages/messages_write.php?usr_id='.$row->usr_id.'">'.$row->email.'</a><br />');
             }
             else
             {
@@ -162,7 +161,7 @@ while($row = $usrStatement->fetchObject())
             {
                 $page->addHtml('<br />'.$gL10n->get('NWU_REMINDER_SEND_LOGIN').'</p>
 
-                <button class="btn btn-default btn-primary" onclick="window.location.href=\''.ADMIDIO_URL.'/adm_program/modules/registration/registration_function.php?new_user_id='.$getNewUserId.'&amp;user_id='.$row->usr_id.'&amp;mode=6\'"><img
+                <button class="btn btn-default btn-primary" onclick="window.location.href=\''.ADMIDIO_URL.FOLDER_MODULES.'/registration/registration_function.php?new_user_id='.$getNewUserId.'&amp;user_id='.$row->usr_id.'&amp;mode=6\'"><img
                     src="'. THEME_URL. '/icons/key.png" alt="'.$gL10n->get('NWU_SEND_LOGIN').'" />'.$gL10n->get('NWU_SEND_LOGIN').'</button>');
             }
         }
@@ -171,14 +170,14 @@ while($row = $usrStatement->fetchObject())
             // Logindaten sind NICHT vorhanden -> diese nun zuordnen
             $page->addHtml('<p>'.$gL10n->get('NWU_USER_NO_VALID_LOGIN').'</p>
 
-            <button class="btn btn-default btn-primary" onclick="window.location.href=\''.ADMIDIO_URL.'/adm_program/modules/registration/registration_function.php?new_user_id='.$getNewUserId.'&amp;user_id='.$row->usr_id.'&amp;mode=1\'"><img
+            <button class="btn btn-default btn-primary" onclick="window.location.href=\''.ADMIDIO_URL.FOLDER_MODULES.'/registration/registration_function.php?new_user_id='.$getNewUserId.'&amp;user_id='.$row->usr_id.'&amp;mode=1\'"><img
                 src="'. THEME_URL. '/icons/new_registrations.png" alt="'.$gL10n->get('NWU_ASSIGN_LOGIN').'" />'.$gL10n->get('NWU_ASSIGN_LOGIN').'</button>');
         }
     }
     else
     {
         // gefundene User ist noch KEIN Mitglied dieser Organisation
-        $link = ADMIDIO_URL.'/adm_program/modules/registration/registration_function.php?new_user_id='.$getNewUserId.'&amp;user_id='.$row->usr_id.'&amp;mode=2';
+        $link = ADMIDIO_URL.FOLDER_MODULES.'/registration/registration_function.php?new_user_id='.$getNewUserId.'&amp;user_id='.$row->usr_id.'&amp;mode=2';
 
         if($row->usr_login_name !== '')
         {

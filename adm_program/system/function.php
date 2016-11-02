@@ -21,13 +21,13 @@ function admFuncAutoload($className)
     global $gLogger;
 
     $libFiles = array(
-        ADMIDIO_PATH . '/adm_program/system/classes/' . strtolower($className) . '.php',
-        ADMIDIO_PATH . '/adm_program/libs/monolog/src/' . str_replace('\\', '/', $className) . '.php',
-//        ADMIDIO_PATH . '/adm_program/libs/phpass/' . strtolower($className) . '.php',
-        ADMIDIO_PATH . '/adm_program/libs/phpmailer/class.' . strtolower($className) . '.php',
-        ADMIDIO_PATH . '/adm_program/libs/psr/log/' . str_replace('\\', '/', $className) . '.php',
-//        ADMIDIO_PATH . '/adm_program/libs/securimage/' . strtolower($className) . '.php',
-        ADMIDIO_PATH . '/adm_program/libs/zxcvbn-php/src/' . substr(str_replace('\\', '/', $className), 9) . '.php'
+        ADMIDIO_PATH . FOLDER_CLASSES . '/' . strtolower($className) . '.php',
+        ADMIDIO_PATH . FOLDER_LIBS_SERVER . '/monolog/src/' . str_replace('\\', '/', $className) . '.php',
+//        ADMIDIO_PATH . FOLDER_LIBS_SERVER . '/phpass/' . strtolower($className) . '.php',
+        ADMIDIO_PATH . FOLDER_LIBS_SERVER . '/phpmailer/class.' . strtolower($className) . '.php',
+        ADMIDIO_PATH . FOLDER_LIBS_SERVER . '/psr/log/' . str_replace('\\', '/', $className) . '.php',
+//        ADMIDIO_PATH . FOLDER_LIBS_SERVER . '/securimage/' . strtolower($className) . '.php',
+        ADMIDIO_PATH . FOLDER_LIBS_SERVER . '/zxcvbn-php/src/' . substr(str_replace('\\', '/', $className), 9) . '.php'
     );
 
     foreach ($libFiles as $libFile)
@@ -561,7 +561,7 @@ function admFuncVariableIsValid(array $array, $variableName, $datatype, array $o
         return $value;
     }
 
-    if(isset($gMessage))
+    if(isset($gMessage) && $gMessage instanceof \Message)
     {
         if($optionsAll['directOutput'])
         {
@@ -691,7 +691,7 @@ function admFuncShowCreateChangeInfoByName($userNameCreated, $timestampCreate, $
             // if valid login and a user id is given than create a link to the profile of this user
             if($gValidLogin && $userIdCreated > 0 && $userNameCreated !== $gL10n->get('SYS_SYSTEM'))
             {
-                $userNameCreated = '<a href="'.ADMIDIO_URL.'/adm_program/modules/profile/profile.php?user_id='.
+                $userNameCreated = '<a href="'.ADMIDIO_URL.FOLDER_MODULES.'/profile/profile.php?user_id='.
                                     $userIdCreated.'">'.$userNameCreated.'</a>';
             }
 
@@ -711,7 +711,7 @@ function admFuncShowCreateChangeInfoByName($userNameCreated, $timestampCreate, $
             // if valid login and a user id is given than create a link to the profile of this user
             if($gValidLogin && $userIdEdited > 0 && $userNameEdited !== $gL10n->get('SYS_SYSTEM'))
             {
-                $userNameEdited = '<a href="'.ADMIDIO_URL.'/adm_program/modules/profile/profile.php?user_id='.
+                $userNameEdited = '<a href="'.ADMIDIO_URL.FOLDER_MODULES.'/profile/profile.php?user_id='.
                                    $userIdEdited.'">'.$userNameEdited.'</a>';
             }
 
@@ -790,4 +790,52 @@ function admFuncCheckUrl($url)
     }
 
     return $url;
+}
+
+/**
+ * This is a safe method for redirecting.
+ * @param string $url        The URL where redirecting to. Must be a absolute URL. (www.example.org)
+ * @param int    $statusCode The status-code which should be send. (301, 302, 303 (default), 307)
+ * @see https://www.owasp.org/index.php/Open_redirect
+ */
+function admRedirect($url, $statusCode = 303)
+{
+    global $gLogger, $gMessage, $gL10n;
+
+    if (headers_sent() === true)
+    {
+        $gLogger->error('Header already sent!', array('url' => $url, 'statusCode' => $statusCode));
+
+        $gMessage->show($gL10n->get('SYS_HEADER_ALREADY_SENT'));
+        // => EXIT
+    }
+    if (filter_var($url, FILTER_VALIDATE_URL) === false)
+    {
+        $gLogger->error('URL is not a valid URL!', array('url' => $url, 'statusCode' => $statusCode));
+
+        $gMessage->show($gL10n->get('SYS_REDIRECT_URL_INVALID'));
+        // => EXIT
+    }
+    if (!in_array($statusCode, array(301, 302, 303, 307), true))
+    {
+        $gLogger->error('Status Code is not allowed!', array('url' => $url, 'statusCode' => $statusCode));
+
+        $gMessage->show($gL10n->get('SYS_STATUS_CODE_INVALID'));
+        // => EXIT
+    }
+
+    if (strpos($url, ADMIDIO_URL) === 0)
+    {
+        // TODO check if user is authorized for url
+        $redirectUrl = $url;
+    }
+    else
+    {
+        $gLogger->notice('Redirecting to an external URL!', array('url' => $url, 'statusCode' => $statusCode));
+
+        $redirectUrl = ADMIDIO_URL . '/adm_program/system/redirect.php?url=' . $url;
+    }
+
+    header('Location: ' . $redirectUrl, true, $statusCode);
+    exit();
 }

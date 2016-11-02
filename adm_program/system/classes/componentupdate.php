@@ -258,7 +258,7 @@ class ComponentUpdate extends Component
                              , ('.$row['org_id'].', \'ANN\', \'IMPORTANT\',   \'SYS_IMPORTANT\',0, 0, 0, 2, '.$systemUserId.', \''.DATETIME_NOW.'\')';
             $this->db->query($sql);
 
-            $sql = 'UPDATE '. TBL_ANNOUNCEMENTS. ' SET ann_cat_id = 
+            $sql = 'UPDATE '. TBL_ANNOUNCEMENTS. ' SET ann_cat_id =
                            (SELECT cat_id FROM '.TBL_CATEGORIES.' WHERE cat_type = \'ANN\' AND cat_name_intern = \'COMMON\')
                      WHERE ann_org_id = '.$row['org_id'];
             $this->db->query($sql);
@@ -380,7 +380,7 @@ class ComponentUpdate extends Component
             {
                 $sql = 'INSERT INTO '.TBL_FOLDERS.' (fol_org_id, fol_type, fol_name, fol_path,
                                                      fol_locked, fol_public, fol_timestamp)
-                                             VALUES ('.$row['org_id'].', \'DOWNLOAD\', \''.TableFolder::getRootFolderName().'\', \'/adm_my_files\',
+                                             VALUES ('.$row['org_id'].', \'DOWNLOAD\', \''.TableFolder::getRootFolderName().'\', \'' . FOLDER_DATA . '\',
                                                      0, 1, \''.DATETIME_NOW.'\')';
                 $this->db->query($sql);
             }
@@ -403,6 +403,45 @@ class ComponentUpdate extends Component
         $sql = 'UPDATE '.TBL_ROLES.' SET rol_name = \''.$gL10n->get('SYS_ADMINISTRATOR').'\'
                  WHERE rol_name = \''.$gL10n->get('SYS_WEBMASTER').'\'';
         $this->db->query($sql);
+    }
+
+    /**
+     * Check all folders in adm_my_files and set the rights to 0777
+     * @param string $folder
+     * @return bool
+     */
+    public function updateStepRewriteFolderRights($folder = '')
+    {
+        $returnValue = true;
+
+        if ($folder === '')
+        {
+            $folder = SERVER_PATH . FOLDER_DATA;
+        }
+
+        $dirHandle = @opendir($folder);
+        if ($dirHandle)
+        {
+            while (($entry = readdir($dirHandle)) !== false)
+            {
+                if ($entry !== '.' && $entry !== '..')
+                {
+                    $resource = $folder . '/' . $entry;
+
+                    if (is_dir($resource))
+                    {
+                        // now check the subfolder
+                        $returnValue = $returnValue && $this->updateStepRewriteFolderRights($resource);
+
+                        // set rights to 0777
+                        $returnValue = $returnValue && chmod($resource, 0777);
+                    }
+                }
+            }
+            closedir($dirHandle);
+        }
+
+        return $returnValue;
     }
 
     /**

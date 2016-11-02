@@ -37,13 +37,13 @@ else
     exit();
 }
 
-require_once(substr(__FILE__, 0, strpos(__FILE__, 'adm_program') - 1) . '/adm_program/system/init_globals.php');
-require_once(substr(__FILE__, 0, strpos(__FILE__, 'adm_program') - 1) . '/adm_program/system/constants.php');
+require_once(substr(__FILE__, 0, strpos(__FILE__, '/adm_program')) . '/adm_program/system/init_globals.php');
+require_once(substr(__FILE__, 0, strpos(__FILE__, '/adm_program')) . '/adm_program/system/constants.php');
 
 // check PHP version and show notice if version is too low
-if(version_compare(phpversion(), MIN_PHP_VERSION, '<'))
+if(version_compare(PHP_VERSION, MIN_PHP_VERSION, '<'))
 {
-    exit('<div style="color: #cc0000;">Error: Your PHP version '.phpversion().' does not fulfill
+    exit('<div style="color: #cc0000;">Error: Your PHP version '.PHP_VERSION.' does not fulfill
         the minimum requirements for this Admidio version. You need at least PHP '.MIN_PHP_VERSION.' or higher.</div>');
 }
 
@@ -76,6 +76,7 @@ if(!$pdoStatement || $pdoStatement->rowCount() === 0)
 {
     // no valid installation exists -> show installation wizard
     header('Location: installation.php');
+    exit();
 }
 
 // create an organization object of the current organization
@@ -102,10 +103,10 @@ $gLanguageData = new LanguageData($gPreferences['system_language']);
 $gL10n->addLanguageData($gLanguageData);
 
 // config.php exists at wrong place
-if(is_file('../../config.php') && is_file('../../adm_my_files/config.php'))
+if(is_file(ADMIDIO_PATH . '/config.php') && is_file(ADMIDIO_PATH . FOLDER_DATA . '/config.php'))
 {
     // try to delete the config file at the old place otherwise show notice to user
-    if(!@unlink('../../config.php'))
+    if(!@unlink(ADMIDIO_PATH . '/config.php'))
     {
         showNotice($gL10n->get('INS_DELETE_CONFIG_FILE', ADMIDIO_URL), ADMIDIO_URL.'/adm_program/installation/index.php',
                    $gL10n->get('SYS_OVERVIEW'), 'layout/application_view_list.png');
